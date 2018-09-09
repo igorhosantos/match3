@@ -1,11 +1,10 @@
 ﻿
 
 public enum PieceType {
-    RED,
-    GREEN,
-    BLUE,
-    YELLOW,
-    ORANGE,
-    PURPLE,
-    PINK
+    R,
+    G,
+    B,
+    Y,
+    O,
+    P
 }

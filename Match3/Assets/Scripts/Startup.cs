@@ -17,6 +17,8 @@ public class Startup : MonoBehaviour {
     private void Awake()
     {
         MatchController.ME.StartSession();
-        Debug.Log("Session has created: " + MatchController.ME.match.ToString());
+
+
+
     }
 }

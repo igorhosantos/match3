@@ -5,11 +5,11 @@ using UnityEngine;
 public class Piece {
 
 
-    private int id;
-    private PieceType type;
-    private Vector2 tupplePosition;
+    public int id { get; private set; }
+    public PieceType type{ get; private set; }
+    public Tupple tupplePosition{ get; set; }
 
-    public Piece(int id,PieceType type,Vector2 tupplePosition)
+    public Piece(int id,PieceType type,Tupple tupplePosition)
     {
         this.id = id;
         this.type = type;
