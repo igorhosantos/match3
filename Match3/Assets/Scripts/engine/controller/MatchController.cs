@@ -10,13 +10,15 @@ public class MatchController : Singleton<MatchController> {
     {
         match = new MatchSession(5,5);
         LogGame(match.board,5);
+        
+    }
 
-
-
-        ExecuteClassicMovement(match.board[0,2]);
-        ExecuteClassicMovement(match.board[0, 3]);
-
+    public void LogButton(int lineOrigin, int collumOrigin, int lineDestiny, int collumnDestiny)
+    {
+        ExecuteClassicMovement(match.board[lineOrigin, collumOrigin]);
+        ExecuteClassicMovement(match.board[lineDestiny, collumnDestiny]);
         LogGame(match.board, 5);
+
     }
 
 

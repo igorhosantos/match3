@@ -40,7 +40,6 @@ public class MatchSession  {
             }
         }
 
-
     }
 
     private Piece firstPiece;
@@ -64,48 +63,100 @@ public class MatchSession  {
            firstPiece.tupplePosition.column == secondPiece.tupplePosition.column + 1 ||
            firstPiece.tupplePosition.column == secondPiece.tupplePosition.column - 1)
         {
-            Debug.Log("Valid Classic Movement");
-            SwapPieces(firstPiece, secondPiece); 
-            Piece[] verticalPieces = CheckVerticalMatches(firstPiece);
-            Piece[] horizontalPieces = CheckHorizontalMatches(firstPiece);
 
-            if(verticalPieces.Length>0 && horizontalPieces.Length>0)
+            Debug.Log("Try Classic Movement: " + firstPiece.tupplePosition + " | " + secondPiece.tupplePosition);
+
+            SwapPieces(firstPiece, secondPiece);
+            
+            List<Piece> verticalPieces = CheckVerticalMatches(firstPiece);
+            verticalPieces.AddRange(CheckVerticalMatches(secondPiece));
+
+            List<Piece> horizontalPieces = CheckHorizontalMatches(firstPiece);
+            horizontalPieces.AddRange(CheckVerticalMatches(secondPiece));
+
+            if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
             {
+                Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
                 //return list of matches
+                string str = "Vertical: " + "\n";
+                for (int i = 0; i < verticalPieces.Count; i++)
+                {
+                    str += verticalPieces[i].type + " | " + verticalPieces[i].tupplePosition + "\n";
+                }
+
+                str += "Horizontal: " + "\n";
+                for (int i = 0; i < horizontalPieces.Count; i++)
+                {
+                    str += horizontalPieces[i].type + " | " + horizontalPieces[i].tupplePosition + "\n";
+                }
+
+                Debug.Log(str);
+
             }
             else
             {
-                SwapPieces(secondPiece, firstPiece);    
+                Debug.Log("Turn back pieces");
+                SwapPieces(firstPiece, secondPiece);    
             }
 
         }
-
-
-       
+      
     }
 
     private void SwapPieces(Piece ft, Piece sc)
     {
-        Piece saveDestiny = sc;
-        board[sc.tupplePosition.line, sc.tupplePosition.column] = ft;
-        board[ft.tupplePosition.line, ft.tupplePosition.column] = saveDestiny;
-        sc.tupplePosition = ft.tupplePosition;
-        ft.tupplePosition = saveDestiny.tupplePosition;
+        board[sc.tupplePosition.line, sc.tupplePosition.column] = firstPiece;
+        board[ft.tupplePosition.line, ft.tupplePosition.column] = secondPiece;
+
+        firstPiece = new Piece(sc.id, sc.type, sc.tupplePosition);
+        secondPiece = new Piece(ft.id, ft.type, ft.tupplePosition);
     }
 
 
-    private Piece[] CheckVerticalMatches(Piece reference)
+    private List<Piece> CheckVerticalMatches(Piece reference)
     {
-        Piece[] verticalPieces = new Piece[]{};
+        List<Piece> verticalPieces = new List<Piece>();
+        Tupple tpIndex = reference.tupplePosition;
 
+        //up reference
+        for (int i = tpIndex.column; i > 0; i--)
+        {
+            if (board[tpIndex.line, i].type == reference.type)
+                verticalPieces.Add(board[tpIndex.line, i]);
+            else break;
+        }
+        //down reference
+        for (int i = tpIndex.column; i < column; i++)
+        {
+            if (board[tpIndex.line, i].type == reference.type)
+                verticalPieces.Add(board[tpIndex.line, i]);
+            else break;
+        }
 
         return verticalPieces;
 
     }
 
-    private Piece[] CheckHorizontalMatches(Piece reference )
+    private List<Piece> CheckHorizontalMatches(Piece reference )
     {
-        Piece[] horizontalPieces = new Piece[] {};
+        List<Piece> horizontalPieces = new List<Piece>();
+
+        Tupple tpIndex = reference.tupplePosition;
+
+        //up reference
+        for (int i = tpIndex.line; i > 0; i--)
+        {
+            if (board[i, tpIndex.column].type == reference.type)
+                horizontalPieces.Add(board[i, tpIndex.column]);
+            else break;
+        }
+        //down reference
+        for (int i = tpIndex.line; i < line; i++)
+        {
+            if (board[i, tpIndex.column].type == reference.type)
+                horizontalPieces.Add(board[i, tpIndex.column]);
+            else break;
+        }
 
         return horizontalPieces;
     }

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio for Mac
+# Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Match3", "Match3.csproj", "{D41FCBE6-465D-5EAC-AB9F-16B8910FCBD9}"
 EndProject
 Global
