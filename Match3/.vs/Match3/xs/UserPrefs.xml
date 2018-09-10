@@ -4,8 +4,8 @@
     <Files>
       <File FileName="Assets/Scripts/engine/model/PieceType.cs" Line="9" Column="6" />
       <File FileName="Assets/Scripts/engine/controller/MatchController.cs" Line="19" Column="33" />
-      <File FileName="Assets/Scripts/Startup.cs" Line="22" Column="9" />
-      <File FileName="Assets/Scripts/engine/model/MatchSession.cs" Line="35" Column="57" />
+      <File FileName="Assets/Scripts/Startup.cs" Line="22" Column="1" />
+      <File FileName="Assets/Scripts/engine/model/MatchSession.cs" Line="67" Column="49" />
       <File FileName="Assets/Scripts/engine/model/Piece.cs" Line="10" Column="39" />
       <File FileName="Assets/Scripts/engine/model/Tuple.cs" Line="8" Column="16" />
     </Files>

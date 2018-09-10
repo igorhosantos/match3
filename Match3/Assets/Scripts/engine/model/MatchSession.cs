@@ -6,6 +6,7 @@ public class MatchSession  {
 
     private int line;
     private int column;
+    private const int MINIMUM_MATCH = 3;
     public Piece[,] board { get; private set; }
 
 
@@ -64,7 +65,19 @@ public class MatchSession  {
            firstPiece.tupplePosition.column == secondPiece.tupplePosition.column - 1)
         {
             Debug.Log("Valid Classic Movement");
-            SwapPieces(firstPiece, secondPiece);
+            SwapPieces(firstPiece, secondPiece); 
+            Piece[] verticalPieces = CheckVerticalMatches(firstPiece);
+            Piece[] horizontalPieces = CheckHorizontalMatches(firstPiece);
+
+            if(verticalPieces.Length>0 && horizontalPieces.Length>0)
+            {
+                //return list of matches
+            }
+            else
+            {
+                SwapPieces(secondPiece, firstPiece);    
+            }
+
         }
 
 
@@ -78,7 +91,23 @@ public class MatchSession  {
         board[ft.tupplePosition.line, ft.tupplePosition.column] = saveDestiny;
         sc.tupplePosition = ft.tupplePosition;
         ft.tupplePosition = saveDestiny.tupplePosition;
+    }
 
+
+    private Piece[] CheckVerticalMatches(Piece reference)
+    {
+        Piece[] verticalPieces = new Piece[]{};
+
+
+        return verticalPieces;
+
+    }
+
+    private Piece[] CheckHorizontalMatches(Piece reference )
+    {
+        Piece[] horizontalPieces = new Piece[] {};
+
+        return horizontalPieces;
     }
 	
 }
