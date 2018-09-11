@@ -45,35 +45,28 @@ public class MatchSession  {
     private Piece firstPiece;
     private Piece secondPiece;
 
-    public void ExecuteClassicMovement(Piece current, int countMovements)
+    public List<Piece> ExecuteClassicMovement(Piece first, Piece second)
     {
-        if (countMovements == 0) 
-        {
-            firstPiece = current;
-            return;
-        }
-
-        if (countMovements == 1) secondPiece = current;
+        firstPiece = first;
+        secondPiece = second;
+        
         if (firstPiece == secondPiece) throw new System.Exception("COMPARE EQUAL PIECES" + firstPiece +  " | " + secondPiece);
-
-
+        
         //CHECK TUPPLE
         if(firstPiece.tupplePosition.line == secondPiece.tupplePosition.line+1 ||
            firstPiece.tupplePosition.line == secondPiece.tupplePosition.line-1 ||
            firstPiece.tupplePosition.column == secondPiece.tupplePosition.column + 1 ||
            firstPiece.tupplePosition.column == secondPiece.tupplePosition.column - 1)
         {
-
-            Debug.Log("Try Classic Movement: " + firstPiece.tupplePosition + " | " + secondPiece.tupplePosition);
-
+            
             SwapPieces(firstPiece, secondPiece);
             
-            List<Piece> verticalPieces = CheckVerticalMatches(firstPiece);
-            verticalPieces.AddRange(CheckVerticalMatches(secondPiece));
+            List<Piece> verticalPieces = CheckVerticalMatches();
+            List<Piece> horizontalPieces = CheckHorizontalMatches();
 
-            List<Piece> horizontalPieces = CheckHorizontalMatches(firstPiece);
-            horizontalPieces.AddRange(CheckVerticalMatches(secondPiece));
-
+            Debug.Log("Matches Vertical: " + verticalPieces.Count);
+            Debug.Log("Matches Horizontal: " + horizontalPieces.Count);
+            
             if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
             {
                 Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
@@ -92,15 +85,26 @@ public class MatchSession  {
 
                 Debug.Log(str);
 
+                List<Piece> totalMatches = new List<Piece>();
+                totalMatches.AddRange(horizontalPieces);
+                totalMatches.AddRange(verticalPieces);
+
+                DestroyMatches(totalMatches);
+
+               
+                return totalMatches;
             }
             else
             {
                 Debug.Log("Turn back pieces");
-                SwapPieces(firstPiece, secondPiece);    
+                SwapPieces(firstPiece, secondPiece);
+                return null;
             }
 
         }
-      
+
+        return null;
+
     }
 
     private void SwapPieces(Piece ft, Piece sc)
@@ -108,57 +112,69 @@ public class MatchSession  {
         board[sc.tupplePosition.line, sc.tupplePosition.column] = firstPiece;
         board[ft.tupplePosition.line, ft.tupplePosition.column] = secondPiece;
 
-        firstPiece = new Piece(sc.id, sc.type, sc.tupplePosition);
-        secondPiece = new Piece(ft.id, ft.type, ft.tupplePosition);
+        Tupple savet = ft.tupplePosition;
+        firstPiece.tupplePosition = sc.tupplePosition;
+        secondPiece.tupplePosition = savet;
     }
-
-
-    private List<Piece> CheckVerticalMatches(Piece reference)
+    
+    private List<Piece> CheckHorizontalMatches()
     {
-        List<Piece> verticalPieces = new List<Piece>();
-        Tupple tpIndex = reference.tupplePosition;
-
-        //up reference
-        for (int i = tpIndex.column; i > 0; i--)
-        {
-            if (board[tpIndex.line, i].type == reference.type)
-                verticalPieces.Add(board[tpIndex.line, i]);
-            else break;
-        }
-        //down reference
-        for (int i = tpIndex.column; i < column; i++)
-        {
-            if (board[tpIndex.line, i].type == reference.type)
-                verticalPieces.Add(board[tpIndex.line, i]);
-            else break;
-        }
-
-        return verticalPieces;
-
-    }
-
-    private List<Piece> CheckHorizontalMatches(Piece reference )
-    {
+       
         List<Piece> horizontalPieces = new List<Piece>();
-
-        Tupple tpIndex = reference.tupplePosition;
-
-        //up reference
-        for (int i = tpIndex.line; i > 0; i--)
-        {
-            if (board[i, tpIndex.column].type == reference.type)
-                horizontalPieces.Add(board[i, tpIndex.column]);
-            else break;
-        }
-        //down reference
-        for (int i = tpIndex.line; i < line; i++)
-        {
-            if (board[i, tpIndex.column].type == reference.type)
-                horizontalPieces.Add(board[i, tpIndex.column]);
-            else break;
-        }
+//        Tupple tpIndex = reference.tupplePosition;
+//
+//        //up reference
+//        for (int i = tpIndex.column; i > 0; i--)
+//        {
+//            if (board[tpIndex.line, i].type == reference.type)
+//                horizontalPieces.Add(board[tpIndex.line, i]);
+//            else break;
+//        }
+//        //down reference
+//        for (int i = tpIndex.column; i < column; i++)
+//        {
+//            if (board[tpIndex.line, i].type == reference.type)
+//                horizontalPieces.Add(board[tpIndex.line, i]);
+//            else break;
+//        }
 
         return horizontalPieces;
+
     }
-	
+
+    private List<Piece> CheckVerticalMatches()
+    {
+
+        List<Piece> verticalPieces = new List<Piece>();
+//
+//        Tupple tpIndex = reference.tupplePosition;
+//
+//        //up reference
+//        for (int i = tpIndex.line; i > 0; i--)
+//        {
+//            if (board[i, tpIndex.column].type == reference.type)
+//                verticalPieces.Add(board[i, tpIndex.column]);
+//            else break;
+//        }
+//        //down reference
+//        for (int i = tpIndex.line; i < line; i++)
+//        {
+//            if (board[i, tpIndex.column].type == reference.type)
+//                verticalPieces.Add(board[i, tpIndex.column]);
+//            else break;
+//        }
+
+        return verticalPieces;
+    }
+
+    private void DestroyMatches(List<Piece> pieces)
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            Tupple reference = pieces[i].tupplePosition;
+            board[reference.line, reference.column] = null;
+        }
+    }
+
+
 }

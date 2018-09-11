@@ -15,10 +15,8 @@ public class MatchController : Singleton<MatchController> {
 
     public void LogButton(int lineOrigin, int collumOrigin, int lineDestiny, int collumnDestiny)
     {
-        ExecuteClassicMovement(match.board[lineOrigin, collumOrigin]);
-        ExecuteClassicMovement(match.board[lineDestiny, collumnDestiny]);
+        List<Piece> piecesToDestroy = ExecuteClassicMovement(match.board[lineOrigin, collumOrigin], match.board[lineDestiny, collumnDestiny]);
         LogGame(match.board, 5);
-
     }
 
 
@@ -35,13 +33,16 @@ public class MatchController : Singleton<MatchController> {
 
                 if (countBreak == breakLine)
                 {
-                    str += rawData[i, j].type;
+                    if (rawData[i, j] != null) str += rawData[i, j].type;
+                    else str += "-1";
+
                     str += '\n';
                     countBreak = 0;
                 }
                 else
                 {
-                    str += rawData[i, j].type + ",";
+                    if (rawData[i, j] != null) str += rawData[i, j].type + ",";
+                    else str += "-1" + ",";
                 }
             }
         }
@@ -49,15 +50,11 @@ public class MatchController : Singleton<MatchController> {
         Debug.Log(str);
     }
 
-    private int countMovement = 0;
-    public void ExecuteClassicMovement(Piece pc)
+    public List<Piece> ExecuteClassicMovement(Piece first , Piece second)
     {
-        if (countMovement > 1) throw new System.Exception("ERROR COUNT MOVEMENT:  " +  countMovement);
-        match.ExecuteClassicMovement(pc,countMovement);
-        if(countMovement==0) countMovement++;
-        else if(countMovement==1) countMovement=0;
+        return match.ExecuteClassicMovement(first,second);
         
-
     }
+
 
 }
