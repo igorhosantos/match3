@@ -8,15 +8,14 @@ public class MatchController : Singleton<MatchController> {
 	
     public void StartSession()
     {
-        match = new MatchSession(5,5);
+        match = new MatchSession(8,5);
         LogGame(match.board,5);
         
     }
 
     public void LogButton(int lineOrigin, int collumOrigin, int lineDestiny, int collumnDestiny)
     {
-        List<Piece> piecesToDestroy = ExecuteClassicMovement(match.board[lineOrigin, collumOrigin], match.board[lineDestiny, collumnDestiny]);
-        LogGame(match.board, 5);
+        //TODO powerup 
     }
 
 

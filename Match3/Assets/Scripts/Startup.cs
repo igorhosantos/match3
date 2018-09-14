@@ -13,15 +13,8 @@ public class Startup : MonoBehaviour
     public int lineDestiny;
     public int collumnDestiny;
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private Canvas mainCanvas;
+    private GameView view;
 
     private void Awake()
     {
@@ -29,6 +22,8 @@ public class Startup : MonoBehaviour
 
         logButton.onClick.AddListener(Teste);
 
+        mainCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        view = mainCanvas.transform.Find("Game").gameObject.AddComponent<GameView>();
     }
 
     private void Teste()
