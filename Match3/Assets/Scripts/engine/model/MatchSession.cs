@@ -30,7 +30,7 @@ public class MatchSession  {
         System.Array types  = System.Enum.GetValues(typeof(PieceType));
         System.Random random = new System.Random();
 
-                                                                          //TODO logic initial pieces here
+        //TODO logic initial pieces here
         for (int i = 0; i < board.GetLength(0); i++)
         {
             for (int j = 0; j < board.GetLength(1); j++)
@@ -119,25 +119,32 @@ public class MatchSession  {
     
     private List<Piece> CheckHorizontalMatches()
     {
-       
         List<Piece> horizontalPieces = new List<Piece>();
-//        Tupple tpIndex = reference.tupplePosition;
-//
-//        //up reference
-//        for (int i = tpIndex.column; i > 0; i--)
-//        {
-//            if (board[tpIndex.line, i].type == reference.type)
-//                horizontalPieces.Add(board[tpIndex.line, i]);
-//            else break;
-//        }
-//        //down reference
-//        for (int i = tpIndex.column; i < column; i++)
-//        {
-//            if (board[tpIndex.line, i].type == reference.type)
-//                horizontalPieces.Add(board[tpIndex.line, i]);
-//            else break;
-//        }
+        int countLine = 0;
 
+        //Debug.Log("Matches Per Line: " + current.type + " | " + criteria.Count + " | " + current.tupplePosition);
+        
+        while (countLine < line)
+        {
+            for (int i = 0; i < column; i++)
+            {
+                for (int j = 0; j < column; j++)
+                {
+                    Piece current = board[countLine, j];
+
+                    List<Piece> criteria = LineCriteria(current);
+                    Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countLine +  " | EQUAL PIECES: " +  criteria.Count);
+                    if (criteria.Count >= MINIMUM_MATCH)
+                    {
+                        horizontalPieces.AddRange(criteria);
+                    }
+                }
+            }
+
+            countLine++;
+        }
+
+        
         return horizontalPieces;
 
     }
@@ -174,6 +181,40 @@ public class MatchSession  {
             Tupple reference = pieces[i].tupplePosition;
             board[reference.line, reference.column] = null;
         }
+    }
+
+
+    private List<Piece> LineCriteria(Piece reference)
+    {
+        List<Piece> countPieces = new List<Piece>();
+        Tupple tpIndex = reference.tupplePosition;
+              
+        countPieces.Add(reference);
+        //left reference
+        for (int i = tpIndex.column; i > 0; i--)
+        {
+            if (board[tpIndex.line, i] == reference)
+            {
+
+            }
+            else if (board[tpIndex.line, i].type == reference.type)
+                countPieces.Add(board[tpIndex.line, i]);
+            else break;
+        }
+        //right reference
+        for (int i = tpIndex.column; i < column; i++)
+        {
+            if (board[tpIndex.line, i] == reference)
+            {
+
+            }
+            else if (board[tpIndex.line, i].type == reference.type)
+                countPieces.Add(board[tpIndex.line, i]);
+            else break;
+        }
+
+
+        return countPieces;
     }
 
 

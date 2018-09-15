@@ -9,16 +9,8 @@ public class GameView : MonoBehaviour
     void Awake()
     {
         board = transform.Find("Board").gameObject.AddComponent<BoardView>();
-        Initiate();
     }
 
 
-    public void Initiate()
-    {
-        for (int i = 0; i < board.pieces.Count; i++)
-        {
-            
-        }
-    }
-
+ 
 }

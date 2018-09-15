@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class BoardView : MonoBehaviour
@@ -10,6 +11,8 @@ public class BoardView : MonoBehaviour
     private int countClick;
     private PieceView first;
     private PieceView second;
+    private List<Piece> piecesToDestroy;
+    private float speedSwap = 0.3f;
     void Awake()
     {
         pieceContainer = transform.Find("Pieces").gameObject;
@@ -54,26 +57,63 @@ public class BoardView : MonoBehaviour
         second = p;
         countClick = 0;
 
-        CheckResult(MatchController.ME.ExecuteClassicMovement(first.currentPiece, second.currentPiece));
+        piecesToDestroy = MatchController.ME.ExecuteClassicMovement(first.currentPiece, second.currentPiece);
+        SwapPieces();
         
     }
     
-
-    private void CheckResult(List<Piece> piecesToDestroy)
+    private void CheckResult()
     {
+        if (piecesToDestroy != null && piecesToDestroy.Count > 0)
+        {
+            OnFinishSwap();
+            DestroyPieces(piecesToDestroy);
+        }
+        else
+            SwapPieces(false);
+    }
+    
+    private void SwapPieces(bool withCallback = true)
+    {
+        foreach (PieceView t in pieces)
+        {
+            t.piecePhysics.bodyType = RigidbodyType2D.Static;
+        }
+
+        Vector2 saveFirst = first.piecePosition.anchoredPosition;
+        Vector2 saveSecond = second.piecePosition.anchoredPosition;
+
+        first.UpdateText(second.currentPiece);
+        second.UpdateText(first.currentPiece);
         
-        if(piecesToDestroy!=null && piecesToDestroy.Count>0) DestroyPieces(piecesToDestroy);
+        first.piecePosition.DOAnchorPos(saveSecond, speedSwap);
+        second.piecePosition.DOAnchorPos(saveFirst, speedSwap).OnComplete(()=>
+        {
+            if (withCallback) CheckResult();
+            else OnFinishSwap();
+        });
+    }
+
+    private void OnFinishSwap()
+    {
+        foreach (PieceView t in pieces)
+        {
+            t.piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+        }
     }
 
     private void DestroyPieces(List<Piece> piecesToDestroy)
     {
-//        for (int i = 0; i < pieces.Count; i++)
-//        {
-//            for (int i = 0; i < piecesToDestroy.Count; i++)
-//            {
-//
-//            }
-//        }
-       
+        foreach (Piece pc in piecesToDestroy)
+        {
+            foreach (PieceView t in pieces)
+            {
+                if (pc == t.currentPiece)
+                {
+                    t.DestroyPiece();
+                    //Destroy(t.gameObject);
+                }
+            }
+        }
     }
 }

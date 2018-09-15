@@ -9,7 +9,7 @@ public class PieceView : MonoBehaviour
     private Text text;
     public RectTransform piecePosition;
     public Button button;
-
+    public Rigidbody2D piecePhysics;
     public Piece currentPiece { get; private set; }
 
     void Awake()
@@ -17,6 +17,7 @@ public class PieceView : MonoBehaviour
         button = GetComponent<Button>();
         image = GetComponent<Image>();
         text = GetComponentInChildren<Text>();
+        piecePhysics = GetComponent<Rigidbody2D>();
         piecePosition = GetComponent<RectTransform>();
     }
     
@@ -45,6 +46,25 @@ public class PieceView : MonoBehaviour
     public void UpdateText(Piece p)
     {
         text.text = p.tupplePosition.ToString();
+    }
+
+    public void DestroyPiece()
+    {
+//        image.color = ColorHEX(0xffffff,0.3f);
+        Destroy(gameObject);
+    }
+
+    public Color ColorHEX(int hexadecimal, float alpha = 1f)
+    {
+        var rgbColor = new Color
+        {
+            r = ((hexadecimal >> 16) & 0xFF) / 255.0f,
+            g = ((hexadecimal >> 8) & 0xFF) / 255.0f,
+            b = (hexadecimal & 0xFF) / 255.0f,
+            a = alpha
+        };
+
+        return rgbColor;
     }
 
 }

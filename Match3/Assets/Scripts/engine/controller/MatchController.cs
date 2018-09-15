@@ -12,12 +12,7 @@ public class MatchController : Singleton<MatchController> {
         LogGame(match.board,5);
         
     }
-
-    public void LogButton(int lineOrigin, int collumOrigin, int lineDestiny, int collumnDestiny)
-    {
-        //TODO powerup 
-    }
-
+    
 
     public static void LogGame(Piece[,] rawData, int breakLine)
     {
