@@ -35,6 +35,9 @@ public class PieceView : MonoBehaviour
             case PieceType.B:
                 image.sprite = Resources.Load<Sprite>("Sprites/jewel3");
                 break;
+            case PieceType.P:
+                image.sprite = Resources.Load<Sprite>("Sprites/jewel4");
+                break;
             default:
                 Debug.LogError("NEED TO IMPLEMENT TYPE: " +  p.type);
                 break;
@@ -50,7 +53,7 @@ public class PieceView : MonoBehaviour
 
     public void DestroyPiece()
     {
-//        image.color = ColorHEX(0xffffff,0.3f);
+        //image.color = ColorHEX(0xffffff,0.3f);
         Destroy(gameObject);
     }
 

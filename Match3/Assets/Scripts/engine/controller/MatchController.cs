@@ -14,7 +14,7 @@ public class MatchController : Singleton<MatchController> {
     }
     
 
-    public static void LogGame(Piece[,] rawData, int breakLine)
+    public void LogGame(Piece[,] rawData, int breakLine)
     {
         string str = "";
         int countBreak = 0;
@@ -28,7 +28,7 @@ public class MatchController : Singleton<MatchController> {
                 if (countBreak == breakLine)
                 {
                     if (rawData[i, j] != null) str += rawData[i, j].type;
-                    else str += "-1";
+                    else str += "X";
 
                     str += '\n';
                     countBreak = 0;
@@ -36,7 +36,7 @@ public class MatchController : Singleton<MatchController> {
                 else
                 {
                     if (rawData[i, j] != null) str += rawData[i, j].type + ",";
-                    else str += "-1" + ",";
+                    else str += "X" + ",";
                 }
             }
         }
@@ -48,6 +48,11 @@ public class MatchController : Singleton<MatchController> {
     {
         return match.ExecuteClassicMovement(first,second);
         
+    }
+
+    public List<List<Piece>> NewPieces()
+    {
+        return match.NewPieces();
     }
 
 

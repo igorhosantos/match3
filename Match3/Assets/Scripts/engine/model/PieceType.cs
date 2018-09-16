@@ -3,8 +3,8 @@
 public enum PieceType {
     R,
     G,
-    B//,
-//    Y,
+    B,
+    P,
 //    O,
-//    P
+//    Y
 }

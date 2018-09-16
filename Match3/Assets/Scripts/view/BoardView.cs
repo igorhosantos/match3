@@ -68,6 +68,8 @@ public class BoardView : MonoBehaviour
         {
             OnFinishSwap();
             DestroyPieces(piecesToDestroy);
+            MatchController.ME.LogGame(MatchController.ME.match.board,5);
+            Invoke("GetNewPieces",1);
         }
         else
             SwapPieces(false);
@@ -115,5 +117,53 @@ public class BoardView : MonoBehaviour
                 }
             }
         }
+
+
     }
+
+    //TODO
+    private void UpdatePosition()
+    {
+        
+        foreach (PieceView t in pieces)
+        {
+            if(t!=null)t.UpdateText(t.currentPiece);
+        }
+    }
+
+    private void GetNewPieces()
+    {
+        List<List<Piece>> newPieces = MatchController.ME.NewPieces();
+
+        MatchController.ME.LogGame(MatchController.ME.match.board,5);
+            
+        string str = "";
+
+        for (int i = 0; i < newPieces.Count; i++)
+        {
+            str += "Collumn " + i + " recieve " + newPieces[i].Count +  '\n';
+        }
+
+        float initalX = 0;
+        float initalY = 800f;
+
+        for (int i = 0; i < newPieces.Count; i++)
+        {
+            for (int j = 0; j < newPieces[i].Count; j++)
+            {
+                GameObject gb = (GameObject)Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
+                PieceView pc = gb.AddComponent<PieceView>();
+                pc.Initate(newPieces[i][j]);
+                pc.piecePosition.anchoredPosition = new Vector2(initalX, initalY);
+                initalY -= 256f;
+                pc.button.onClick.AddListener(() => PieceChosen(pc));
+
+            }
+            initalY = 800;
+            initalX += 265;
+        }
+
+        Debug.Log(str);
+    }
+
 }

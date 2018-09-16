@@ -64,12 +64,12 @@ public class MatchSession  {
             List<Piece> verticalPieces = CheckVerticalMatches();
             List<Piece> horizontalPieces = CheckHorizontalMatches();
 
-            Debug.Log("Matches Vertical: " + verticalPieces.Count);
-            Debug.Log("Matches Horizontal: " + horizontalPieces.Count);
+            //Debug.Log("Matches Vertical: " + verticalPieces.Count);
+            //Debug.Log("Matches Horizontal: " + horizontalPieces.Count);
             
             if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
             {
-                Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
+                //Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
                 //return list of matches
                 string str = "Vertical: " + "\n";
                 for (int i = 0; i < verticalPieces.Count; i++)
@@ -96,7 +96,7 @@ public class MatchSession  {
             }
             else
             {
-                Debug.Log("Turn back pieces");
+                //Debug.Log("Turn back pieces");
                 SwapPieces(firstPiece, secondPiece);
                 return null;
             }
@@ -133,7 +133,7 @@ public class MatchSession  {
                     Piece current = board[countLine, j];
 
                     List<Piece> criteria = LineCriteria(current);
-                    Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countLine +  " | EQUAL PIECES: " +  criteria.Count);
+//                    Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countLine +  " | EQUAL PIECES: " +  criteria.Count);
                     if (criteria.Count >= MINIMUM_MATCH)
                     {
                         horizontalPieces.AddRange(criteria);
@@ -153,23 +153,31 @@ public class MatchSession  {
     {
 
         List<Piece> verticalPieces = new List<Piece>();
-//
-//        Tupple tpIndex = reference.tupplePosition;
-//
-//        //up reference
-//        for (int i = tpIndex.line; i > 0; i--)
-//        {
-//            if (board[i, tpIndex.column].type == reference.type)
-//                verticalPieces.Add(board[i, tpIndex.column]);
-//            else break;
-//        }
-//        //down reference
-//        for (int i = tpIndex.line; i < line; i++)
-//        {
-//            if (board[i, tpIndex.column].type == reference.type)
-//                verticalPieces.Add(board[i, tpIndex.column]);
-//            else break;
-//        }
+
+        int countCollumn = 0;
+
+        //Debug.Log("Matches Per Line: " + current.type + " | " + criteria.Count + " | " + current.tupplePosition);
+        
+        while (countCollumn < column)
+        {
+            for (int i = 0; i < line; i++)
+            {
+                for (int j = 0; j < line; j++)
+                {
+                    Piece current = board[j, countCollumn];
+
+                    List<Piece> criteria = CollumnCriteria(current);
+                    //Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countCollumn +  " | EQUAL PIECES: " +  criteria.Count);
+                    if (criteria.Count >= MINIMUM_MATCH)
+                    {
+                        verticalPieces.AddRange(criteria);
+                    }
+                }
+            }
+
+            countCollumn++;
+        }
+
 
         return verticalPieces;
     }
@@ -181,6 +189,66 @@ public class MatchSession  {
             Tupple reference = pieces[i].tupplePosition;
             board[reference.line, reference.column] = null;
         }
+
+        Reposition();
+
+    }
+
+    private void Reposition()
+    {
+        //TODO logic initial pieces here
+        for (int i = board.GetLength(0)-1; i >= 0 ; i--)
+        {
+            for (int j = board.GetLength(1)-1; j >= 0; j--)
+            {
+                if(board[i, j] == null)
+                {
+                    int index = i-1;
+
+                    while(index >= 0 && board[i, j] == null)
+                    {
+                        if (board[index, j] != null)
+                        {
+                            board[i,j] = board[index, j];
+                            board[i,j].tupplePosition = new Tupple(index, j);
+                            board[index, j] = null;
+                        }
+
+                        index--;
+                    }
+
+                }
+            }
+        }
+    }
+
+    public List<List<Piece>> NewPieces()
+    {
+        List<List<Piece>> newpieces = new List<List<Piece>>();
+
+        System.Array types = System.Enum.GetValues(typeof(PieceType));
+        System.Random random = new System.Random();
+
+       for (int j = 0; j < column; j++)
+       {
+            int currentLine = 0;
+            newpieces.Add(new List<Piece>());
+
+            while(currentLine<line)
+            {
+                if (board[currentLine, j] == null)
+                {
+                    PieceType randomType = (PieceType)types.GetValue(random.Next(types.Length));
+                    board[currentLine, j] = new Piece(currentLine, randomType, new Tupple(currentLine, j));
+                    newpieces[j].Add(board[currentLine, j]);
+                }
+                currentLine++;
+            }
+
+        }
+
+
+        return newpieces;
     }
 
 
@@ -210,6 +278,40 @@ public class MatchSession  {
             }
             else if (board[tpIndex.line, i].type == reference.type)
                 countPieces.Add(board[tpIndex.line, i]);
+            else break;
+        }
+
+
+        return countPieces;
+    }
+
+    private List<Piece> CollumnCriteria(Piece reference)
+    {
+        List<Piece> countPieces = new List<Piece>();
+
+        Tupple tpIndex = reference.tupplePosition;
+        countPieces.Add(reference);
+
+//        //up reference
+        for (int i = tpIndex.line; i > 0; i--)
+        {
+            if (board[i, tpIndex.column] == reference)
+            {
+
+            }
+            else if (board[i, tpIndex.column].type == reference.type)
+                countPieces.Add(board[i, tpIndex.column]);
+            else break;
+        }
+        //down reference
+        for (int i = tpIndex.line; i < line; i++)
+        {
+            if (board[i, tpIndex.column] == reference)
+            {
+
+            }
+            else if (board[i, tpIndex.column].type == reference.type)
+                countPieces.Add(board[i, tpIndex.column]);
             else break;
         }
 
