@@ -8,17 +8,11 @@ public class MatchController : Singleton<MatchController> {
 	
     public void StartSession()
     {
-        match = new MatchSession(5,5);
+        match = new MatchSession(8,5);
         LogGame(match.board,5);
-
-
-
-        ExecuteClassicMovement(match.board[0,2]);
-        ExecuteClassicMovement(match.board[0, 3]);
-
-        LogGame(match.board, 5);
+        
     }
-
+    
 
     public static void LogGame(Piece[,] rawData, int breakLine)
     {
@@ -33,13 +27,16 @@ public class MatchController : Singleton<MatchController> {
 
                 if (countBreak == breakLine)
                 {
-                    str += rawData[i, j].type;
+                    if (rawData[i, j] != null) str += rawData[i, j].type;
+                    else str += "-1";
+
                     str += '\n';
                     countBreak = 0;
                 }
                 else
                 {
-                    str += rawData[i, j].type + ",";
+                    if (rawData[i, j] != null) str += rawData[i, j].type + ",";
+                    else str += "-1" + ",";
                 }
             }
         }
@@ -47,15 +44,11 @@ public class MatchController : Singleton<MatchController> {
         Debug.Log(str);
     }
 
-    private int countMovement = 0;
-    public void ExecuteClassicMovement(Piece pc)
+    public List<Piece> ExecuteClassicMovement(Piece first , Piece second)
     {
-        if (countMovement > 1) throw new System.Exception("ERROR COUNT MOVEMENT:  " +  countMovement);
-        match.ExecuteClassicMovement(pc,countMovement);
-        if(countMovement==0) countMovement++;
-        else if(countMovement==1) countMovement=0;
+        return match.ExecuteClassicMovement(first,second);
         
-
     }
+
 
 }
