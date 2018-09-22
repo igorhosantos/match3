@@ -71,7 +71,7 @@ public class MatchSession  {
             {
                 //Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
                 //return list of matches
-                string str = "Vertical: " + "\n";
+                /*string str = "Vertical: " + "\n";
                 for (int i = 0; i < verticalPieces.Count; i++)
                 {
                     str += verticalPieces[i].type + " | " + verticalPieces[i].tupplePosition + "\n";
@@ -83,7 +83,7 @@ public class MatchSession  {
                     str += horizontalPieces[i].type + " | " + horizontalPieces[i].tupplePosition + "\n";
                 }
 
-                Debug.Log(str);
+                Debug.Log(str);*/
 
                 List<Piece> totalMatches = new List<Piece>();
                 totalMatches.AddRange(horizontalPieces);
@@ -171,6 +171,13 @@ public class MatchSession  {
                     if (criteria.Count >= MINIMUM_MATCH)
                     {
                         verticalPieces.AddRange(criteria);
+                        /*string str = "FIND VERTICAL MATCH: " + '\n';
+                        for (int k = 0; k < verticalPieces.Count; k++)
+                        {
+                            str += verticalPieces[k].type + " | ";
+                        }
+
+                        Debug.Log(str);*/
                     }
                 }
             }
@@ -256,7 +263,8 @@ public class MatchSession  {
     {
         List<Piece> countPieces = new List<Piece>();
         Tupple tpIndex = reference.tupplePosition;
-              
+
+        //piece to make a match
         countPieces.Add(reference);
         //left reference
         for (int i = tpIndex.column; i > 0; i--)

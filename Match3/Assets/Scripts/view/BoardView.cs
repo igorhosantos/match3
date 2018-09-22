@@ -6,22 +6,25 @@ using UnityEngine;
 public class BoardView : MonoBehaviour
 {
 
-    public List<PieceView> pieces { get; private set; }
+    public PieceView[,] pieces { get; private set; }
     private GameObject pieceContainer;
     private int countClick;
     private PieceView first;
     private PieceView second;
     private List<Piece> piecesToDestroy;
+    private List<List<Piece>> newPieces;
     private float speedSwap = 0.3f;
     void Awake()
     {
         pieceContainer = transform.Find("Pieces").gameObject;
         DrawSession();
+
+        LogView();
     }
 
     private void DrawSession()
     {
-        pieces = new List<PieceView>();
+        pieces = new PieceView[MatchController.ME.match.board.GetLength(0),MatchController.ME.match.board.GetLength(1)];
 
         float initalX = 0;
         float initalY = 800f;
@@ -34,7 +37,7 @@ public class BoardView : MonoBehaviour
                 PieceView pc = gb.AddComponent<PieceView>();
                 pc.Initate(MatchController.ME.match.board[i,j]);
                 pc.piecePosition.anchoredPosition = new Vector2(initalX,initalY);
-                pieces.Add(pc);
+                pieces[i,j] = pc;
                 initalX += 265f;
                 pc.button.onClick.AddListener(()=>PieceChosen(pc));
 
@@ -42,7 +45,8 @@ public class BoardView : MonoBehaviour
             initalX = 0;
             initalY -= 256;
         }
-        
+
+        Invoke("CheckResult",2);
     }
     
     private void PieceChosen(PieceView p)
@@ -66,28 +70,38 @@ public class BoardView : MonoBehaviour
     {
         if (piecesToDestroy != null && piecesToDestroy.Count > 0)
         {
+            ConfirmSwap(first, second);
             OnFinishSwap();
+            LogView();
             DestroyPieces(piecesToDestroy);
-            MatchController.ME.LogGame(MatchController.ME.match.board,5);
-            Invoke("GetNewPieces",1);
+            GetNewPieces();
+            RePosition();
+            Invoke("DropNewPieces", 0.5f);
+
+        }
+        else if (first != null && second != null)
+        {
+            SwapPieces(false);
         }
         else
-            SwapPieces(false);
+        {
+            Debug.Log("CHECK MATCHES WITHOUT MOVEMENT");
+        }
     }
     
     private void SwapPieces(bool withCallback = true)
     {
-        foreach (PieceView t in pieces)
+        for (var i = 0; i < pieces.GetLength(0); i++)
         {
-            t.piecePhysics.bodyType = RigidbodyType2D.Static;
+            for (int j = 0; j < pieces.GetLength(1); j++)
+            {
+                pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
+            }
         }
 
         Vector2 saveFirst = first.piecePosition.anchoredPosition;
         Vector2 saveSecond = second.piecePosition.anchoredPosition;
-
-        first.UpdateText(second.currentPiece);
-        second.UpdateText(first.currentPiece);
-        
+         
         first.piecePosition.DOAnchorPos(saveSecond, speedSwap);
         second.piecePosition.DOAnchorPos(saveFirst, speedSwap).OnComplete(()=>
         {
@@ -96,11 +110,20 @@ public class BoardView : MonoBehaviour
         });
     }
 
+    private void ConfirmSwap(PieceView ft, PieceView sc)
+    {
+        pieces[sc.currentPiece.tupplePosition.line, sc.currentPiece.tupplePosition.column] = second;
+        pieces[ft.currentPiece.tupplePosition.line, ft.currentPiece.tupplePosition.column] = first;
+    }
+
     private void OnFinishSwap()
     {
-        foreach (PieceView t in pieces)
+        for (var i = 0; i < pieces.GetLength(0); i++)
         {
-            t.piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+            for (int j = 0; j < pieces.GetLength(1); j++)
+            {
+                pieces[i,j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+            }
         }
     }
 
@@ -108,44 +131,62 @@ public class BoardView : MonoBehaviour
     {
         foreach (Piece pc in piecesToDestroy)
         {
-            foreach (PieceView t in pieces)
+            Tupple pos = new Tupple(pc.tupplePosition.line, pc.tupplePosition.column);
+            PieceView current = pieces[pos.line, pos.column];
+            if (current != null)
             {
-                if (pc == t.currentPiece)
+                //Debug.Log("DESTROY :" + current.currentPiece.type + " | " + current.currentPiece.tupplePosition);
+                current.DestroyPiece();
+                //current.SetOld();
+                pieces[pos.line, pos.column] = null;
+ 
+            }
+        }
+    }
+
+    private void RePosition()
+    {
+        //Order pieces
+        for (int i = pieces.GetLength(0) - 1; i >= 0; i--)
+        {
+            for (int j = pieces.GetLength(1) - 1; j >= 0; j--)
+            {
+                if (pieces[i, j] == null)
                 {
-                    t.DestroyPiece();
-                    //Destroy(t.gameObject);
+                    int index = i - 1;
+
+                    while (index >= 0 && pieces[i, j] == null)
+                    {
+                        if (pieces[index, j] != null)
+                        {
+                            pieces[i, j] = pieces[index, j];
+                            pieces[index, j] = null;
+
+                        }
+
+                        index--;
+                    }
+
                 }
+
             }
         }
 
-
-    }
-
-    //TODO
-    private void UpdatePosition()
-    {
-        
-        foreach (PieceView t in pieces)
-        {
-            if(t!=null)t.UpdateText(t.currentPiece);
-        }
     }
 
     private void GetNewPieces()
     {
-        List<List<Piece>> newPieces = MatchController.ME.NewPieces();
+        newPieces = MatchController.ME.NewPieces();
+        //MatchController.ME.LogGame(MatchController.ME.match.board,5);
+       
+    }
 
-        MatchController.ME.LogGame(MatchController.ME.match.board,5);
-            
-        string str = "";
-
-        for (int i = 0; i < newPieces.Count; i++)
-        {
-            str += "Collumn " + i + " recieve " + newPieces[i].Count +  '\n';
-        }
-
+    private void DropNewPieces()
+    {
         float initalX = 0;
         float initalY = 800f;
+
+        List<PieceView> newPiecesView = new List<PieceView>();
 
         for (int i = 0; i < newPieces.Count; i++)
         {
@@ -157,10 +198,63 @@ public class BoardView : MonoBehaviour
                 pc.piecePosition.anchoredPosition = new Vector2(initalX, initalY);
                 initalY -= 256f;
                 pc.button.onClick.AddListener(() => PieceChosen(pc));
+                newPiecesView.Add(pc);
+
+                pieces[pc.currentPiece.tupplePosition.line, pc.currentPiece.tupplePosition.column] = pc;
 
             }
             initalY = 800;
             initalX += 265;
+        }
+
+     
+        //RETUPLE
+        for (int i = pieces.GetLength(0) - 1; i >= 0; i--)
+        {
+            for (int j = pieces.GetLength(1) - 1; j >= 0; j--)
+            {
+                //if (pieces[i, j] != null)
+                //{
+                    pieces[i, j].currentPiece.tupplePosition = new Tupple(i, j);
+                    pieces[i, j].UpdateText();
+                //}
+            }
+        }
+
+        first = second = null;
+        //Invoke("CheckResult", 1);
+
+    }
+
+    public void LogView()
+    {
+        
+        string str = "Log View" + '\n';
+        int countBreak = 0;
+        int breakLine = 5;
+
+        for (int i = 0; i < pieces.GetLength(0); i++)
+        {
+            for (int j = 0; j < pieces.GetLength(1); j++)
+            {
+                countBreak++;
+
+                if (countBreak == breakLine)
+                {
+                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type;
+                    else str += "X";
+
+                    str += '\n';
+                    countBreak = 0;
+                }
+                else
+                {
+                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type + ",";
+                    else str += "X" + ",";
+                }
+
+            }
+           
         }
 
         Debug.Log(str);

@@ -9,14 +9,15 @@ public class MatchController : Singleton<MatchController> {
     public void StartSession()
     {
         match = new MatchSession(8,5);
-        LogGame(match.board,5);
+        //LogGame(match.board,5);
         
     }
     
 
     public void LogGame(Piece[,] rawData, int breakLine)
     {
-        string str = "";
+ 
+        string str = "Log Engine" + '\n';
         int countBreak = 0;
 
         for (int i = 0; i < rawData.GetLength(0); i++)

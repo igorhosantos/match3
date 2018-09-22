@@ -43,12 +43,12 @@ public class PieceView : MonoBehaviour
                 break;
         }
 
-        UpdateText(p);
+        UpdateText();
     }
 
-    public void UpdateText(Piece p)
+    public void UpdateText()
     {
-        text.text = p.tupplePosition.ToString();
+        text.text = currentPiece.tupplePosition.ToString();
     }
 
     public void DestroyPiece()
@@ -69,5 +69,11 @@ public class PieceView : MonoBehaviour
 
         return rgbColor;
     }
+
+    public void SetOld()
+    {
+        image.color = ColorHEX(0xffffff,0.3f);
+    }
+
 
 }
