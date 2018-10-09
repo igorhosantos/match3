@@ -12,6 +12,7 @@ public class BoardView : MonoBehaviour
     private PieceView first;
     private PieceView second;
     private List<Piece> piecesToDestroy;
+    private List<Piece> pendingPiecesToDestroy;
     private List<List<Piece>> newPieces;
     private float speedSwap = 0.3f;
     void Awake()
@@ -46,7 +47,7 @@ public class BoardView : MonoBehaviour
             initalY -= 256;
         }
 
-        Invoke("CheckResult",2);
+        Invoke("CheckResult",3);
     }
     
     private void PieceChosen(PieceView p)
@@ -68,6 +69,7 @@ public class BoardView : MonoBehaviour
     
     private void CheckResult()
     {
+       
         if (piecesToDestroy != null && piecesToDestroy.Count > 0)
         {
             ConfirmSwap(first, second);
@@ -77,6 +79,7 @@ public class BoardView : MonoBehaviour
             GetNewPieces();
             RePosition();
             Invoke("DropNewPieces", 0.5f);
+            piecesToDestroy.Clear();
 
         }
         else if (first != null && second != null)
@@ -85,7 +88,19 @@ public class BoardView : MonoBehaviour
         }
         else
         {
-            Debug.Log("CHECK MATCHES WITHOUT MOVEMENT");
+            pendingPiecesToDestroy = MatchController.ME.PendingPieces();
+            if (pendingPiecesToDestroy != null && pendingPiecesToDestroy.Count > 0)
+            {
+                DestroyPieces(pendingPiecesToDestroy);
+                GetNewPieces();
+                RePosition();
+                Invoke("DropNewPieces", 0.5f);
+            }
+            else
+            {
+                Debug.Log("NO MATCHES");
+            
+            }
         }
     }
     
@@ -98,6 +113,7 @@ public class BoardView : MonoBehaviour
                 pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
             }
         }
+
 
         Vector2 saveFirst = first.piecePosition.anchoredPosition;
         Vector2 saveSecond = second.piecePosition.anchoredPosition;
@@ -142,6 +158,7 @@ public class BoardView : MonoBehaviour
  
             }
         }
+
     }
 
     private void RePosition()
@@ -222,7 +239,7 @@ public class BoardView : MonoBehaviour
         }
 
         first = second = null;
-        //Invoke("CheckResult", 1);
+        Invoke("CheckResult", 2);
 
     }
 

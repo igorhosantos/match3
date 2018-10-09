@@ -107,6 +107,25 @@ public class MatchSession  {
 
     }
 
+    public List<Piece> PendingPieces()
+    {
+        List<Piece> verticalPieces = CheckVerticalMatches();
+        List<Piece> horizontalPieces = CheckHorizontalMatches();
+
+
+        if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
+        {
+            List<Piece> totalMatches = new List<Piece>();
+            totalMatches.AddRange(horizontalPieces);
+            totalMatches.AddRange(verticalPieces);
+            DestroyMatches(totalMatches);
+
+            return totalMatches;
+        }
+
+        return null;
+    }
+
     private void SwapPieces(Piece ft, Piece sc)
     {
         board[sc.tupplePosition.line, sc.tupplePosition.column] = firstPiece;
@@ -166,6 +185,9 @@ public class MatchSession  {
                 {
                     Piece current = board[j, countCollumn];
 
+                    //Debug.Log(j +  " | " + countCollumn);
+                    //Debug.Log(current);
+
                     List<Piece> criteria = CollumnCriteria(current);
                     //Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countCollumn +  " | EQUAL PIECES: " +  criteria.Count);
                     if (criteria.Count >= MINIMUM_MATCH)
@@ -178,7 +200,8 @@ public class MatchSession  {
                         }
 
                         Debug.Log(str);*/
-                    }
+                    }    
+
                 }
             }
 

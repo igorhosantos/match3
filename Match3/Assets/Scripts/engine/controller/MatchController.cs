@@ -56,5 +56,10 @@ public class MatchController : Singleton<MatchController> {
         return match.NewPieces();
     }
 
+    public List<Piece> PendingPieces()
+    {
+        return match.PendingPieces();
+
+    }
 
 }
