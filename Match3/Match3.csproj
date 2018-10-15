@@ -320,9 +320,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\engine\controller\MatchController.cs" />
+    <Compile Include="Assets\Scripts\engine\controller\PowerupController.cs" />
     <Compile Include="Assets\Scripts\engine\model\MatchSession.cs" />
     <Compile Include="Assets\Scripts\engine\model\Piece.cs" />
     <Compile Include="Assets\Scripts\engine\model\PieceType.cs" />
+    <Compile Include="Assets\Scripts\engine\model\powerup\OneCollumnPw.cs" />
+    <Compile Include="Assets\Scripts\engine\model\powerup\OneLinePw.cs" />
+    <Compile Include="Assets\Scripts\engine\model\powerup\OneTypePw.cs" />
+    <Compile Include="Assets\Scripts\engine\model\powerup\Powerup.cs" />
+    <Compile Include="Assets\Scripts\engine\model\powerup\XPw.cs" />
     <Compile Include="Assets\Scripts\engine\model\Tuple.cs" />
     <Compile Include="Assets\Scripts\Startup.cs" />
     <Compile Include="Assets\Scripts\utils\Singleton.cs" />

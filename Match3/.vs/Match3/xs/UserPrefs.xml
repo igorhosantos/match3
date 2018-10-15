@@ -1,11 +1,17 @@
 ﻿<Properties StartupConfiguration="{D41FCBE6-465D-5EAC-AB9F-16B8910FCBD9}|">
   <MonoDevelop.Ide.ItemProperties.Match3 PreferredExecutionTarget="Unity.Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/view/BoardView.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/view/GameView.cs">
     <Files>
-      <File FileName="Assets/Scripts/view/BoardView.cs" Line="148" Column="46" />
-      <File FileName="Assets/Scripts/engine/model/MatchSession.cs" Line="189" Column="23" />
-      <File FileName="Assets/Scripts/engine/controller/MatchController.cs" Line="61" Column="35" />
-      <File FileName="Assets/Scripts/engine/model/Piece.cs" Line="7" Column="5" />
+      <File FileName="Assets/Scripts/view/BoardView.cs" Line="87" Column="10" />
+      <File FileName="Assets/Scripts/engine/model/MatchSession.cs" Line="318" Column="21" />
+      <File FileName="Assets/Scripts/engine/controller/MatchController.cs" Line="67" Column="16" />
+      <File FileName="Assets/Scripts/engine/model/Piece.cs" Line="7" Column="1" />
+      <File FileName="Assets/Scripts/engine/model/powerup/Powerup.cs" Line="7" Column="57" />
+      <File FileName="Assets/Scripts/engine/model/powerup/OneLinePw.cs" Line="19" Column="6" />
+      <File FileName="Assets/Scripts/engine/controller/PowerupController.cs" Line="26" Column="10" />
+      <File FileName="Assets/Scripts/view/GameView.cs" Line="14" Column="9" />
+      <File FileName="Assets/Scripts/engine/model/powerup/OneCollumnPw.cs" Line="13" Column="73" />
+      <File FileName="Assets/Scripts/engine/model/powerup/OneTypePw.cs" Line="8" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

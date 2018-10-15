@@ -62,4 +62,9 @@ public class MatchController : Singleton<MatchController> {
 
     }
 
+    public List<Piece> ExecutePowerup(List<Piece> pieces)
+    {
+        return match.ExecutePowerup(pieces);
+    }
+
 }
