@@ -64,27 +64,8 @@ public class MatchSession  {
             List<Piece> verticalPieces = CheckVerticalMatches();
             List<Piece> horizontalPieces = CheckHorizontalMatches();
 
-            //Debug.Log("Matches Vertical: " + verticalPieces.Count);
-            //Debug.Log("Matches Horizontal: " + horizontalPieces.Count);
-            
             if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
             {
-                //Debug.Log("Apply destroy : " + verticalPieces.Count +  " | " + horizontalPieces.Count);
-                //return list of matches
-                /*string str = "Vertical: " + "\n";
-                for (int i = 0; i < verticalPieces.Count; i++)
-                {
-                    str += verticalPieces[i].type + " | " + verticalPieces[i].tupplePosition + "\n";
-                }
-
-                str += "Horizontal: " + "\n";
-                for (int i = 0; i < horizontalPieces.Count; i++)
-                {
-                    str += horizontalPieces[i].type + " | " + horizontalPieces[i].tupplePosition + "\n";
-                }
-
-                Debug.Log(str);*/
-
                 List<Piece> totalMatches = new List<Piece>();
                 totalMatches.AddRange(horizontalPieces);
                 totalMatches.AddRange(verticalPieces);
@@ -141,8 +122,6 @@ public class MatchSession  {
         List<Piece> horizontalPieces = new List<Piece>();
         int countLine = 0;
 
-        //Debug.Log("Matches Per Line: " + current.type + " | " + criteria.Count + " | " + current.tupplePosition);
-        
         while (countLine < line)
         {
             for (int i = 0; i < column; i++)
@@ -152,11 +131,9 @@ public class MatchSession  {
                     Piece current = board[countLine, j];
 
                     List<Piece> criteria = LineCriteria(current);
-//                    Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countLine +  " | EQUAL PIECES: " +  criteria.Count);
+
                     if (criteria.Count >= MINIMUM_MATCH)
-                    {
                         horizontalPieces.AddRange(criteria);
-                    }
                 }
             }
 
@@ -170,13 +147,10 @@ public class MatchSession  {
 
     private List<Piece> CheckVerticalMatches()
     {
-
         List<Piece> verticalPieces = new List<Piece>();
 
         int countCollumn = 0;
 
-        //Debug.Log("Matches Per Line: " + current.type + " | " + criteria.Count + " | " + current.tupplePosition);
-        
         while (countCollumn < column)
         {
             for (int i = 0; i < line; i++)
@@ -185,23 +159,11 @@ public class MatchSession  {
                 {
                     Piece current = board[j, countCollumn];
 
-                    //Debug.Log(j +  " | " + countCollumn);
-                    //Debug.Log(current);
-
                     List<Piece> criteria = CollumnCriteria(current);
-                    //Debug.Log("CURRENT PIECE: " + current.type +  " " +  current.tupplePosition +  " LINE: " + countCollumn +  " | EQUAL PIECES: " +  criteria.Count);
+
                     if (criteria.Count >= MINIMUM_MATCH)
-                    {
                         verticalPieces.AddRange(criteria);
-                        /*string str = "FIND VERTICAL MATCH: " + '\n';
-                        for (int k = 0; k < verticalPieces.Count; k++)
-                        {
-                            str += verticalPieces[k].type + " | ";
-                        }
-
-                        Debug.Log(str);*/
-                    }    
-
+                  
                 }
             }
 
@@ -226,7 +188,6 @@ public class MatchSession  {
 
     private void Reposition()
     {
-        //TODO logic initial pieces here
         for (int i = board.GetLength(0)-1; i >= 0 ; i--)
         {
             for (int j = board.GetLength(1)-1; j >= 0; j--)
@@ -348,6 +309,13 @@ public class MatchSession  {
 
 
         return countPieces;
+    }
+
+    public List<Piece> ExecutePowerup(List<Piece> list)
+    {
+        DestroyMatches(list);
+
+        return list;
     }
 
 

@@ -12,6 +12,7 @@ public class BoardView : MonoBehaviour
     private PieceView first;
     private PieceView second;
     private List<Piece> piecesToDestroy;
+    private List<Piece> powerupPiecesToDestroy;
     private List<Piece> pendingPiecesToDestroy;
     private List<List<Piece>> newPieces;
     private float speedSwap = 0.3f;
@@ -66,11 +67,25 @@ public class BoardView : MonoBehaviour
         SwapPieces();
         
     }
-    
+
+
+    public void UsePowerup(PowerupController.POWERUP_TYPE type, Piece p)
+    {
+        powerupPiecesToDestroy = PowerupController.ME.ExecutePowerup(type,p);
+        CheckResult();
+    }
+
     private void CheckResult()
     {
-       
-        if (piecesToDestroy != null && piecesToDestroy.Count > 0)
+        if(powerupPiecesToDestroy != null && powerupPiecesToDestroy.Count > 0)
+        {
+            DestroyPieces(powerupPiecesToDestroy);
+            GetNewPieces();
+            RePosition();
+            Invoke("DropNewPieces", 0.5f);
+            powerupPiecesToDestroy.Clear();
+        }
+        else if (piecesToDestroy != null && piecesToDestroy.Count > 0)
         {
             ConfirmSwap(first, second);
             OnFinishSwap();
