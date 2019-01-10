@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.view.services;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameView : MonoBehaviour
+public class GameView : MonoBehaviour, IGameServices
 {
     private BoardView board;
 
     void Awake()
     {
-        board = transform.Find("Board").gameObject.AddComponent<BoardView>();
+        MatchController.ME.StartSession(this,8, 5);
 
+        board = transform.Find("Board").gameObject.AddComponent<BoardView>();
 
         //TODO MOCK
         Button pwOneLine = GameObject.Find("PwDestroyLine").GetComponent<Button>();
@@ -26,10 +28,8 @@ public class GameView : MonoBehaviour
     
     }
 
-    public void ExecutePowerup()
-    {
-        
-    }
-
- 
+    public void NotifyMovement(List<Piece> pieces) => board.NotifyMovement(pieces);
+    public void NotifyDropPieces(List<List<Piece>> pieces) => board.NotifyDropPieces(pieces);
+    public void NotifyOtherMatches(List<Piece> pieces)=> board.NotifyOtherMatches(pieces);
+  
 }

@@ -1,51 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.engine.behaviour;
+using Assets.Scripts.engine.model.piece;
+using Assets.Scripts.view.services;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class MatchSession  {
 
     private int line;
     private int column;
-    private const int MINIMUM_MATCH = 3;
     public Piece[,] board { get; private set; }
-
-
+    private MatchBehaviour behaviour;
+    private IGameServices services;
+    
     public override string ToString()
     {
         //string str = "";
         return "[" +  board + "]";
             
     }
-    public MatchSession(int line, int column)
+    public MatchSession(IGameServices services, int line, int column)
     {
+        this.services = services;
         this.line = line;
         this.column = column;
+
         board = new Piece[line, column];
-        InitialPieces();
+
+        behaviour = new MatchBehaviour(board);
+        behaviour.InitialPieces();
     }
 
-    private void InitialPieces()
-    {
-        
-        System.Array types  = System.Enum.GetValues(typeof(PieceType));
-        System.Random random = new System.Random();
-
-        //TODO logic initial pieces here
-        for (int i = 0; i < board.GetLength(0); i++)
-        {
-            for (int j = 0; j < board.GetLength(1); j++)
-            {
-                PieceType randomType = (PieceType)types.GetValue(random.Next(types.Length));
-                board[i,j] = new Piece(i, randomType, new Tupple(i, j));
-            }
-        }
-
-    }
 
     private Piece firstPiece;
     private Piece secondPiece;
 
-    public List<Piece> ExecuteClassicMovement(Piece first, Piece second)
+    public void RequestMovement(Piece first, Piece second)
     {
         firstPiece = first;
         secondPiece = second;
@@ -53,18 +44,14 @@ public class MatchSession  {
         if (firstPiece == secondPiece) throw new System.Exception("COMPARE EQUAL PIECES" + firstPiece +  " | " + secondPiece);
         
         //CHECK TUPPLE
-        if(firstPiece.tupplePosition.line == secondPiece.tupplePosition.line+1 ||
-           firstPiece.tupplePosition.line == secondPiece.tupplePosition.line-1 ||
-           firstPiece.tupplePosition.column == secondPiece.tupplePosition.column + 1 ||
-           firstPiece.tupplePosition.column == secondPiece.tupplePosition.column - 1)
+        if(CheckTupple(firstPiece, secondPiece))
         {
-            
             SwapPieces(firstPiece, secondPiece);
             
             List<Piece> verticalPieces = CheckVerticalMatches();
             List<Piece> horizontalPieces = CheckHorizontalMatches();
 
-            if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
+            if (verticalPieces.Count > MatchBehaviour.MINIMUM_MATCH || horizontalPieces.Count > MatchBehaviour.MINIMUM_MATCH)
             {
                 List<Piece> totalMatches = new List<Piece>();
                 totalMatches.AddRange(horizontalPieces);
@@ -72,39 +59,39 @@ public class MatchSession  {
 
                 DestroyMatches(totalMatches);
 
-               
-                return totalMatches;
+                services.NotifyMovement( totalMatches);
             }
-            else
-            {
-                //Debug.Log("Turn back pieces");
-                SwapPieces(firstPiece, secondPiece);
-                return null;
-            }
-
+            else SwapPieces(firstPiece, secondPiece);
+           
         }
-
-        return null;
 
     }
 
-    public List<Piece> PendingPieces()
+    private bool CheckTupple(Piece firstPiece, Piece secondPiece)
+    {
+        return firstPiece.tupplePosition.line == secondPiece.tupplePosition.line + 1 ||
+               firstPiece.tupplePosition.line == secondPiece.tupplePosition.line - 1 ||
+               firstPiece.tupplePosition.column == secondPiece.tupplePosition.column + 1 ||
+               firstPiece.tupplePosition.column == secondPiece.tupplePosition.column - 1;
+    }
+
+    public void RequestOtherMatches()
     {
         List<Piece> verticalPieces = CheckVerticalMatches();
         List<Piece> horizontalPieces = CheckHorizontalMatches();
 
-
-        if (verticalPieces.Count > MINIMUM_MATCH || horizontalPieces.Count > MINIMUM_MATCH)
+        if (verticalPieces.Count > MatchBehaviour.MINIMUM_MATCH || horizontalPieces.Count > MatchBehaviour.MINIMUM_MATCH)
         {
             List<Piece> totalMatches = new List<Piece>();
             totalMatches.AddRange(horizontalPieces);
             totalMatches.AddRange(verticalPieces);
             DestroyMatches(totalMatches);
 
-            return totalMatches;
+            services.NotifyOtherMatches(totalMatches);
         }
+        
 
-        return null;
+        services.NotifyOtherMatches(null);
     }
 
     private void SwapPieces(Piece ft, Piece sc)
@@ -132,7 +119,7 @@ public class MatchSession  {
 
                     List<Piece> criteria = LineCriteria(current);
 
-                    if (criteria.Count >= MINIMUM_MATCH)
+                    if (criteria.Count >= MatchBehaviour.MINIMUM_MATCH)
                         horizontalPieces.AddRange(criteria);
                 }
             }
@@ -161,7 +148,7 @@ public class MatchSession  {
 
                     List<Piece> criteria = CollumnCriteria(current);
 
-                    if (criteria.Count >= MINIMUM_MATCH)
+                    if (criteria.Count >= MatchBehaviour.MINIMUM_MATCH)
                         verticalPieces.AddRange(criteria);
                   
                 }
@@ -213,35 +200,11 @@ public class MatchSession  {
         }
     }
 
-    public List<List<Piece>> NewPieces()
+    public void RequestDropPieces()
     {
-        List<List<Piece>> newpieces = new List<List<Piece>>();
-
-        System.Array types = System.Enum.GetValues(typeof(PieceType));
-        System.Random random = new System.Random();
-
-       for (int j = 0; j < column; j++)
-       {
-            int currentLine = 0;
-            newpieces.Add(new List<Piece>());
-
-            while(currentLine<line)
-            {
-                if (board[currentLine, j] == null)
-                {
-                    PieceType randomType = (PieceType)types.GetValue(random.Next(types.Length));
-                    board[currentLine, j] = new Piece(currentLine, randomType, new Tupple(currentLine, j));
-                    newpieces[j].Add(board[currentLine, j]);
-                }
-                currentLine++;
-            }
-
-        }
-
-
-        return newpieces;
+        List<List<Piece>> newpieces = behaviour.DropPieces();
+        services.NotifyDropPieces(newpieces);
     }
-
 
     private List<Piece> LineCriteria(Piece reference)
     {
@@ -257,7 +220,7 @@ public class MatchSession  {
             {
 
             }
-            else if (board[tpIndex.line, i].type == reference.type)
+            else if (CheckValidPiece(board[tpIndex.line, i], reference))
                 countPieces.Add(board[tpIndex.line, i]);
             else break;
         }
@@ -268,7 +231,7 @@ public class MatchSession  {
             {
 
             }
-            else if (board[tpIndex.line, i].type == reference.type)
+            else if (CheckValidPiece(board[tpIndex.line, i], reference))
                 countPieces.Add(board[tpIndex.line, i]);
             else break;
         }
@@ -291,7 +254,7 @@ public class MatchSession  {
             {
 
             }
-            else if (board[i, tpIndex.column].type == reference.type)
+            else if (CheckValidPiece(board[i, tpIndex.column],reference))
                 countPieces.Add(board[i, tpIndex.column]);
             else break;
         }
@@ -302,13 +265,20 @@ public class MatchSession  {
             {
 
             }
-            else if (board[i, tpIndex.column].type == reference.type)
+            else if (CheckValidPiece(board[i, tpIndex.column], reference))
                 countPieces.Add(board[i, tpIndex.column]);
             else break;
         }
 
 
         return countPieces;
+    }
+
+
+    private bool CheckValidPiece(Piece boardPiece, Piece refPiece)
+    {
+        return boardPiece.type is ValidPiece && refPiece.type is ValidPiece &&
+               boardPiece.type.type == refPiece.type.type;
     }
 
     public List<Piece> ExecutePowerup(List<Piece> list)

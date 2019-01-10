@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.view.services;
 using UnityEngine;
 
 public class MatchController : Singleton<MatchController> {
 
     public MatchSession match { get; private set; }
 	
-    public void StartSession()
+    public void StartSession(IGameServices services,int line , int collumn)
     {
-        match = new MatchSession(8,5);
+        match = new MatchSession(services, line, collumn);
         //LogGame(match.board,5);
         
     }
@@ -45,22 +46,9 @@ public class MatchController : Singleton<MatchController> {
         Debug.Log(str);
     }
 
-    public List<Piece> ExecuteClassicMovement(Piece first , Piece second)
-    {
-        return match.ExecuteClassicMovement(first,second);
-        
-    }
-
-    public List<List<Piece>> NewPieces()
-    {
-        return match.NewPieces();
-    }
-
-    public List<Piece> PendingPieces()
-    {
-        return match.PendingPieces();
-
-    }
+    public void RequestMovement(Piece first , Piece second)=> match.RequestMovement(first,second);
+    public void RequestDropPieces()=> match.RequestDropPieces();
+    public void RequestOtherMatches()=> match.RequestOtherMatches();
 
     public List<Piece> ExecutePowerup(List<Piece> pieces)
     {

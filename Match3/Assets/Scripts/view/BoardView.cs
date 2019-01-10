@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class BoardView : MonoBehaviour
 {
-
     public PieceView[,] pieces { get; private set; }
     private GameObject pieceContainer;
     private int countClick;
@@ -16,11 +15,11 @@ public class BoardView : MonoBehaviour
     private List<Piece> pendingPiecesToDestroy;
     private List<List<Piece>> newPieces;
     private float speedSwap = 0.3f;
+
     void Awake()
     {
         pieceContainer = transform.Find("Pieces").gameObject;
         DrawSession();
-
         LogView();
     }
 
@@ -48,7 +47,7 @@ public class BoardView : MonoBehaviour
             initalY -= 256;
         }
 
-        Invoke("CheckResult",3);
+        Invoke(nameof(CheckResult), 3);
     }
     
     private void PieceChosen(PieceView p)
@@ -63,9 +62,30 @@ public class BoardView : MonoBehaviour
         second = p;
         countClick = 0;
 
-        piecesToDestroy = MatchController.ME.ExecuteClassicMovement(first.currentPiece, second.currentPiece);
+        MatchController.ME.RequestMovement(first.currentPiece, second.currentPiece);
+    }
+
+    public void NotifyMovement(List<Piece> pieces)
+    {
+        piecesToDestroy = pieces;
         SwapPieces();
-        
+    }
+
+    public void NotifyDropPieces(List<List<Piece>> pieces) => newPieces = pieces;
+
+    public void NotifyOtherMatches(List<Piece> pieces)
+    {
+        pendingPiecesToDestroy = pieces;
+
+        if (pendingPiecesToDestroy != null && pendingPiecesToDestroy.Count > 0)
+        {
+            DestroyPieces(pendingPiecesToDestroy);
+            GetNewPieces();
+            RePosition();
+            Invoke(nameof(DropNewPieces), 0.5f);
+        }
+        else Debug.Log("NO MATCHES");
+
     }
 
 
@@ -82,7 +102,7 @@ public class BoardView : MonoBehaviour
             DestroyPieces(powerupPiecesToDestroy);
             GetNewPieces();
             RePosition();
-            Invoke("DropNewPieces", 0.5f);
+            Invoke(nameof(DropNewPieces), 0.5f);
             powerupPiecesToDestroy.Clear();
         }
         else if (piecesToDestroy != null && piecesToDestroy.Count > 0)
@@ -93,42 +113,20 @@ public class BoardView : MonoBehaviour
             DestroyPieces(piecesToDestroy);
             GetNewPieces();
             RePosition();
-            Invoke("DropNewPieces", 0.5f);
+            Invoke(nameof(DropNewPieces), 0.5f);
             piecesToDestroy.Clear();
 
         }
-        else if (first != null && second != null)
-        {
-            SwapPieces(false);
-        }
-        else
-        {
-            pendingPiecesToDestroy = MatchController.ME.PendingPieces();
-            if (pendingPiecesToDestroy != null && pendingPiecesToDestroy.Count > 0)
-            {
-                DestroyPieces(pendingPiecesToDestroy);
-                GetNewPieces();
-                RePosition();
-                Invoke("DropNewPieces", 0.5f);
-            }
-            else
-            {
-                Debug.Log("NO MATCHES");
-            
-            }
-        }
+        else if (first != null && second != null) SwapPieces(false);
+        else MatchController.ME.RequestOtherMatches();
+      
     }
-    
+  
     private void SwapPieces(bool withCallback = true)
     {
         for (var i = 0; i < pieces.GetLength(0); i++)
-        {
             for (int j = 0; j < pieces.GetLength(1); j++)
-            {
                 pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
-            }
-        }
-
 
         Vector2 saveFirst = first.piecePosition.anchoredPosition;
         Vector2 saveSecond = second.piecePosition.anchoredPosition;
@@ -150,12 +148,8 @@ public class BoardView : MonoBehaviour
     private void OnFinishSwap()
     {
         for (var i = 0; i < pieces.GetLength(0); i++)
-        {
             for (int j = 0; j < pieces.GetLength(1); j++)
-            {
                 pieces[i,j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
-            }
-        }
     }
 
     private void DestroyPieces(List<Piece> piecesToDestroy)
@@ -164,16 +158,14 @@ public class BoardView : MonoBehaviour
         {
             Tupple pos = new Tupple(pc.tupplePosition.line, pc.tupplePosition.column);
             PieceView current = pieces[pos.line, pos.column];
+
             if (current != null)
             {
-                //Debug.Log("DESTROY :" + current.currentPiece.type + " | " + current.currentPiece.tupplePosition);
                 current.DestroyPiece();
-                //current.SetOld();
                 pieces[pos.line, pos.column] = null;
  
             }
         }
-
     }
 
     private void RePosition()
@@ -198,21 +190,13 @@ public class BoardView : MonoBehaviour
 
                         index--;
                     }
-
                 }
-
             }
         }
-
     }
 
-    private void GetNewPieces()
-    {
-        newPieces = MatchController.ME.NewPieces();
-        //MatchController.ME.LogGame(MatchController.ME.match.board,5);
-       
-    }
-
+    private void GetNewPieces()=> MatchController.ME.RequestDropPieces();
+    
     private void DropNewPieces()
     {
         float initalX = 0;
@@ -254,8 +238,7 @@ public class BoardView : MonoBehaviour
         }
 
         first = second = null;
-        Invoke("CheckResult", 2);
-
+        Invoke(nameof(CheckResult), 2);
     }
 
     public void LogView()

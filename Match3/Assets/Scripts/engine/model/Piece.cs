@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Piece {
 
-
     public int id { get; private set; }
     public PieceType type{ get; private set; }
     public Tupple tupplePosition{ get; set; }
