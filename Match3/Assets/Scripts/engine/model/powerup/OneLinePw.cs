@@ -10,9 +10,9 @@ public class OneLinePw : Powerup {
         Tupple lineRef = p.tupplePosition;
 
 
-        for (int j = 0; j < MatchController.ME.match.board.GetLength(1); j++)
+        for (int j = 0; j < MatchController.ME.session.board.GetLength(1); j++)
         {
-            lp.Add(MatchController.ME.match.board[lineRef.line, j]);
+            lp.Add(MatchController.ME.session.board[lineRef.line, j]);
         }
 
         return lp;

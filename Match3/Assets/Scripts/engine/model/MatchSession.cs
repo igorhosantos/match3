@@ -104,62 +104,8 @@ public class MatchSession  {
         secondPiece.tupplePosition = savet;
     }
     
-    private List<Piece> CheckHorizontalMatches()
-    {
-        List<Piece> horizontalPieces = new List<Piece>();
-        int countLine = 0;
-
-        while (countLine < line)
-        {
-            for (int i = 0; i < column; i++)
-            {
-                for (int j = 0; j < column; j++)
-                {
-                    Piece current = board[countLine, j];
-
-                    List<Piece> criteria = LineCriteria(current);
-
-                    if (criteria.Count >= MatchBehaviour.MINIMUM_MATCH)
-                        horizontalPieces.AddRange(criteria);
-                }
-            }
-
-            countLine++;
-        }
-
-        
-        return horizontalPieces;
-
-    }
-
-    private List<Piece> CheckVerticalMatches()
-    {
-        List<Piece> verticalPieces = new List<Piece>();
-
-        int countCollumn = 0;
-
-        while (countCollumn < column)
-        {
-            for (int i = 0; i < line; i++)
-            {
-                for (int j = 0; j < line; j++)
-                {
-                    Piece current = board[j, countCollumn];
-
-                    List<Piece> criteria = CollumnCriteria(current);
-
-                    if (criteria.Count >= MatchBehaviour.MINIMUM_MATCH)
-                        verticalPieces.AddRange(criteria);
-                  
-                }
-            }
-
-            countCollumn++;
-        }
-
-
-        return verticalPieces;
-    }
+    private List<Piece> CheckHorizontalMatches() => behaviour.CheckHorizontalMatches();
+    private List<Piece> CheckVerticalMatches()=> behaviour.CheckVerticalMatches();
 
     private void DestroyMatches(List<Piece> pieces)
     {
@@ -204,81 +150,6 @@ public class MatchSession  {
     {
         List<List<Piece>> newpieces = behaviour.DropPieces();
         services.NotifyDropPieces(newpieces);
-    }
-
-    private List<Piece> LineCriteria(Piece reference)
-    {
-        List<Piece> countPieces = new List<Piece>();
-        Tupple tpIndex = reference.tupplePosition;
-
-        //piece to make a match
-        countPieces.Add(reference);
-        //left reference
-        for (int i = tpIndex.column; i > 0; i--)
-        {
-            if (board[tpIndex.line, i] == reference)
-            {
-
-            }
-            else if (CheckValidPiece(board[tpIndex.line, i], reference))
-                countPieces.Add(board[tpIndex.line, i]);
-            else break;
-        }
-        //right reference
-        for (int i = tpIndex.column; i < column; i++)
-        {
-            if (board[tpIndex.line, i] == reference)
-            {
-
-            }
-            else if (CheckValidPiece(board[tpIndex.line, i], reference))
-                countPieces.Add(board[tpIndex.line, i]);
-            else break;
-        }
-
-
-        return countPieces;
-    }
-
-    private List<Piece> CollumnCriteria(Piece reference)
-    {
-        List<Piece> countPieces = new List<Piece>();
-
-        Tupple tpIndex = reference.tupplePosition;
-        countPieces.Add(reference);
-
-//        //up reference
-        for (int i = tpIndex.line; i > 0; i--)
-        {
-            if (board[i, tpIndex.column] == reference)
-            {
-
-            }
-            else if (CheckValidPiece(board[i, tpIndex.column],reference))
-                countPieces.Add(board[i, tpIndex.column]);
-            else break;
-        }
-        //down reference
-        for (int i = tpIndex.line; i < line; i++)
-        {
-            if (board[i, tpIndex.column] == reference)
-            {
-
-            }
-            else if (CheckValidPiece(board[i, tpIndex.column], reference))
-                countPieces.Add(board[i, tpIndex.column]);
-            else break;
-        }
-
-
-        return countPieces;
-    }
-
-
-    private bool CheckValidPiece(Piece boardPiece, Piece refPiece)
-    {
-        return boardPiece.type is ValidPiece && refPiece.type is ValidPiece &&
-               boardPiece.type.type == refPiece.type.type;
     }
 
     public List<Piece> ExecutePowerup(List<Piece> list)

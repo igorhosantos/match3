@@ -19,24 +19,25 @@ public class BoardView : MonoBehaviour
     void Awake()
     {
         pieceContainer = transform.Find("Pieces").gameObject;
+//        LogEngine();
         DrawSession();
         LogView();
     }
 
     private void DrawSession()
     {
-        pieces = new PieceView[MatchController.ME.match.board.GetLength(0),MatchController.ME.match.board.GetLength(1)];
+        pieces = new PieceView[MatchController.ME.session.board.GetLength(0),MatchController.ME.session.board.GetLength(1)];
 
         float initalX = 0;
         float initalY = 800f;
         
-        for (int i = 0; i < MatchController.ME.match.board.GetLength(0); i++)
+        for (int i = 0; i < MatchController.ME.session.board.GetLength(0); i++)
         {
-            for (int j = 0; j < MatchController.ME.match.board.GetLength(1); j++)
+            for (int j = 0; j < MatchController.ME.session.board.GetLength(1); j++)
             {
                 GameObject gb = (GameObject) Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
                 PieceView pc = gb.AddComponent<PieceView>();
-                pc.Initate(MatchController.ME.match.board[i,j]);
+                pc.Initate(MatchController.ME.session.board[i,j]);
                 pc.piecePosition.anchoredPosition = new Vector2(initalX,initalY);
                 pieces[i,j] = pc;
                 initalX += 265f;
@@ -243,7 +244,6 @@ public class BoardView : MonoBehaviour
 
     public void LogView()
     {
-        
         string str = "Log View" + '\n';
         int countBreak = 0;
         int breakLine = 5;
@@ -256,7 +256,7 @@ public class BoardView : MonoBehaviour
 
                 if (countBreak == breakLine)
                 {
-                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type;
+                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type.type;
                     else str += "X";
 
                     str += '\n';
@@ -264,12 +264,46 @@ public class BoardView : MonoBehaviour
                 }
                 else
                 {
-                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type + ",";
+                    if (pieces[i,j] != null) str += pieces[i,j].currentPiece.type.type + ",";
                     else str += "X" + ",";
                 }
 
             }
            
+        }
+
+        Debug.Log(str);
+    }
+
+    public void LogEngine()
+    {
+
+        string str = "Log Engine" + '\n';
+        int countBreak = 0;
+        int breakLine = 5;
+
+        for (int i = 0; i < MatchController.ME.session.board.GetLength(0); i++)
+        {
+            for (int j = 0; j < MatchController.ME.session.board.GetLength(1); j++)
+            {
+                countBreak++;
+
+                if (countBreak == breakLine)
+                {
+                    if (MatchController.ME.session.board[i, j] != null) str += MatchController.ME.session.board[i, j].type.type;
+                    else str += "X";
+
+                    str += '\n';
+                    countBreak = 0;
+                }
+                else
+                {
+                    if (MatchController.ME.session.board[i, j] != null) str += MatchController.ME.session.board[i, j].type.type + ",";
+                    else str += "X" + ",";
+                }
+
+            }
+
         }
 
         Debug.Log(str);

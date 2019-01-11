@@ -10,9 +10,9 @@ public class OneCollumnPw : Powerup {
         Tupple tref = p.tupplePosition;
 
 
-        for (int j = 0; j < MatchController.ME.match.board.GetLength(0); j++)
+        for (int j = 0; j < MatchController.ME.session.board.GetLength(0); j++)
         {
-            lp.Add(MatchController.ME.match.board[j, tref.column]);
+            lp.Add(MatchController.ME.session.board[j, tref.column]);
         }
 
         return lp;

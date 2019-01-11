@@ -16,15 +16,15 @@ public class GameView : MonoBehaviour, IGameServices
 
         //TODO MOCK
         Button pwOneLine = GameObject.Find("PwDestroyLine").GetComponent<Button>();
-        pwOneLine.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_LINE_PW, MatchController.ME.match.board[2, 0]));
+        pwOneLine.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_LINE_PW, MatchController.ME.session.board[2, 0]));
 
         //PwDestroyCollumn
         Button pwOneCollumn = GameObject.Find("PwDestroyCollumn").GetComponent<Button>();
-        pwOneCollumn.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_COLLUMN_PW, MatchController.ME.match.board[0, 2]));
+        pwOneCollumn.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_COLLUMN_PW, MatchController.ME.session.board[0, 2]));
     
         //PwDestroyColor
         Button pwOneType = GameObject.Find("PwDestroyColor").GetComponent<Button>();
-        pwOneType.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_TYPE_PW, MatchController.ME.match.board[0, 0]));
+        pwOneType.onClick.AddListener(()=>board.UsePowerup(PowerupController.POWERUP_TYPE.ONE_TYPE_PW, MatchController.ME.session.board[0, 0]));
     
     }
 

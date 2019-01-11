@@ -10,11 +10,11 @@ public class OneTypePw : Powerup {
         PieceType pref = p.type;
 
 
-        for (int i = 0; i < MatchController.ME.match.board.GetLength(0); i++)
+        for (int i = 0; i < MatchController.ME.session.board.GetLength(0); i++)
         {
-            for (int j = 0; j < MatchController.ME.match.board.GetLength(1); j++)
+            for (int j = 0; j < MatchController.ME.session.board.GetLength(1); j++)
             {
-                if(MatchController.ME.match.board[i,j].type == pref) lp.Add(MatchController.ME.match.board[i,j]);
+                if(MatchController.ME.session.board[i,j].type == pref) lp.Add(MatchController.ME.session.board[i,j]);
             }
 
         }
