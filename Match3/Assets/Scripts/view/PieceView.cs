@@ -13,6 +13,7 @@ public class PieceView : MonoBehaviour
     public Button button;
     public Rigidbody2D piecePhysics;
     public Piece currentPiece { get; private set; }
+    public Vector2 destiny { get; private set; } 
 
     private Dictionary<string, string > validPieces = new Dictionary<string, string>()
     {
@@ -32,8 +33,9 @@ public class PieceView : MonoBehaviour
         piecePosition = GetComponent<RectTransform>();
     }
     
-    public void Initate(Piece p)
+    public void Initate(Piece p, Vector2 destiny)
     {
+        this.destiny = destiny;
         currentPiece = p;
         switch (p.type)
         {

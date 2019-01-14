@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -14,7 +13,10 @@ public class BoardView : MonoBehaviour
     private List<Piece> powerupPiecesToDestroy;
     private List<Piece> pendingPiecesToDestroy;
     private List<List<Piece>> newPieces;
-    private float speedSwap = 0.3f;
+
+    public float speedSwap = 0.3f;
+    public float speedMatch = 0.5f; 
+    public Ease  easeMatch = Ease.InExpo; 
 
     void Awake()
     {
@@ -29,7 +31,7 @@ public class BoardView : MonoBehaviour
         pieces = new PieceView[MatchController.ME.session.board.GetLength(0),MatchController.ME.session.board.GetLength(1)];
 
         float initalX = 0;
-        float initalY = 800f;
+        float initalY = 1800f;
         
         for (int i = 0; i < MatchController.ME.session.board.GetLength(0); i++)
         {
@@ -37,17 +39,18 @@ public class BoardView : MonoBehaviour
             {
                 GameObject gb = (GameObject) Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
                 PieceView pc = gb.AddComponent<PieceView>();
-                pc.Initate(MatchController.ME.session.board[i,j]);
+                pc.Initate(MatchController.ME.session.board[i,j], new Vector2((i*256),-(j*256)));
                 pc.piecePosition.anchoredPosition = new Vector2(initalX,initalY);
                 pieces[i,j] = pc;
                 initalX += 265f;
                 pc.button.onClick.AddListener(()=>PieceChosen(pc));
-
+                //MovePiece(pc);
             }
             initalX = 0;
             initalY -= 256;
         }
 
+        RemovePhysics();
         Invoke(nameof(CheckResult), 3);
     }
     
@@ -125,10 +128,7 @@ public class BoardView : MonoBehaviour
   
     private void SwapPieces(bool withCallback = true)
     {
-        for (var i = 0; i < pieces.GetLength(0); i++)
-            for (int j = 0; j < pieces.GetLength(1); j++)
-                pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
-
+      
         Vector2 saveFirst = first.piecePosition.anchoredPosition;
         Vector2 saveSecond = second.piecePosition.anchoredPosition;
          
@@ -146,11 +146,23 @@ public class BoardView : MonoBehaviour
         pieces[ft.currentPiece.tupplePosition.line, ft.currentPiece.tupplePosition.column] = first;
     }
 
-    private void OnFinishSwap()
+    private void RemovePhysics()
     {
         for (var i = 0; i < pieces.GetLength(0); i++)
-            for (int j = 0; j < pieces.GetLength(1); j++)
-                pieces[i,j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+        for (int j = 0; j < pieces.GetLength(1); j++)
+            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
+    }
+
+    private void AddPhysics()
+    {
+        for (var i = 0; i < pieces.GetLength(0); i++)
+        for (int j = 0; j < pieces.GetLength(1); j++)
+            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    private void OnFinishSwap()
+    {
+        
     }
 
     private void DestroyPieces(List<Piece> piecesToDestroy)
@@ -211,7 +223,8 @@ public class BoardView : MonoBehaviour
             {
                 GameObject gb = (GameObject)Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
                 PieceView pc = gb.AddComponent<PieceView>();
-                pc.Initate(newPieces[i][j]);
+                Piece p = newPieces[i][j];
+                pc.Initate(p,new Vector2(0,0));
                 pc.piecePosition.anchoredPosition = new Vector2(initalX, initalY);
                 initalY -= 256f;
                 pc.button.onClick.AddListener(() => PieceChosen(pc));
@@ -240,6 +253,12 @@ public class BoardView : MonoBehaviour
 
         first = second = null;
         Invoke(nameof(CheckResult), 2);
+    }
+
+
+    private void MovePiece(PieceView p)
+    {
+        p.piecePosition.DOAnchorPos(p.destiny, speedMatch).SetEase(easeMatch).SetDelay(5);
     }
 
     public void LogView()
