@@ -29,9 +29,9 @@ namespace Assets.Scripts.engine.behaviour
 
             boardPositions = new Vector2[board.GetLength(0), board.GetLength(1)];
 
-            for (int i = board.GetLength(0)-1; i > 0; i--)
+            for (int i = board.GetLength(0)-1; i >= 0; i--)
             {
-                for (int j = board.GetLength(1)-1; j > 0 ; j--)
+                for (int j = board.GetLength(1)-1; j >= 0 ; j--)
                 {
                     boardPositions[i,j] = new Vector2(initialX- pieceSize, initialY + pieceSize);
                     initialX -= pieceSize;
@@ -59,7 +59,7 @@ namespace Assets.Scripts.engine.behaviour
 
         public Vector2 Destiny(int line, int collumn)
         {
-            Debug.Log("POSITION: " + boardPositions[line, collumn]);
+            //Debug.Log("POSITION: " + boardPositions[line, collumn]);
             return boardPositions[line, collumn];
         }
 

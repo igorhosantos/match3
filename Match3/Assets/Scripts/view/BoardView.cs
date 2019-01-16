@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -15,12 +16,20 @@ public class BoardView : MonoBehaviour
     private List<List<Piece>> newPieces;
 
     public float speedSwap = 0.3f;
-    public float speedMatch = 0.5f; 
-    public Ease  easeMatch = Ease.InExpo; 
+    public float speedMatch = 0.5f;
+    public float speedDraw = 1f;
+    public Ease easeMatch = Ease.InOutExpo;
 
-    
+    public Vector2 boardSize { get; private set; }
+
+    void Awake()
+    {
+        boardSize = GetComponent<RectTransform>().sizeDelta;
+    }
+
     public void Initiate()
     {
+        DestroySession();
         pieceContainer = transform.Find("Pieces").gameObject;
         //        LogEngine();
 
@@ -28,13 +37,26 @@ public class BoardView : MonoBehaviour
         LogView();
     }
 
+    public void DestroySession()
+    {
+        CancelInvoke(nameof(CheckResult));
+        CancelInvoke(nameof(DropNewPieces));
+
+        if (pieces == null) return;
+
+        for (var i = 0; i < pieces.GetLength(0); i++)
+        for (int j = 0; j < pieces.GetLength(1); j++)
+            if(pieces[i, j]!=null && pieces[i, j].gameObject!=null) Destroy(pieces[i, j].gameObject);
+    }
+
     private void DrawSession()
     {
         pieces = new PieceView[MatchController.ME.session.board.GetLength(0),MatchController.ME.session.board.GetLength(1)];
 
         float initalX = 0;
-        float initalY = 1800f;
-        
+        float initalY = boardSize.y;
+
+
         for (int i = 0; i < MatchController.ME.session.board.GetLength(0); i++)
         {
             for (int j = 0; j < MatchController.ME.session.board.GetLength(1); j++)
@@ -46,13 +68,12 @@ public class BoardView : MonoBehaviour
                 pieces[i,j] = pc;
                 initalX += 265f;
                 pc.button.onClick.AddListener(()=>PieceChosen(pc));
-                MovePiece(pc);
+                MovePiece(pc,true);
             }
             initalX = 0;
             initalY -= 256;
         }
 
-        RemovePhysics();
         Invoke(nameof(CheckResult), 3);
     }
     
@@ -88,7 +109,8 @@ public class BoardView : MonoBehaviour
             DestroyPieces(pendingPiecesToDestroy);
             GetNewPieces();
             RePosition();
-            Invoke(nameof(DropNewPieces), 0.5f);
+            DropNewPieces();
+//            Invoke(nameof(DropNewPieces), 0.3f);
         }
         else Debug.Log("NO MATCHES");
 
@@ -108,7 +130,8 @@ public class BoardView : MonoBehaviour
             DestroyPieces(powerupPiecesToDestroy);
             GetNewPieces();
             RePosition();
-            Invoke(nameof(DropNewPieces), 0.5f);
+            //            Invoke(nameof(DropNewPieces), 0.3f);
+            DropNewPieces();
             powerupPiecesToDestroy.Clear();
         }
         else if (piecesToDestroy != null && piecesToDestroy.Count > 0)
@@ -119,7 +142,8 @@ public class BoardView : MonoBehaviour
             DestroyPieces(piecesToDestroy);
             GetNewPieces();
             RePosition();
-            Invoke(nameof(DropNewPieces), 0.5f);
+            //            Invoke(nameof(DropNewPieces), 0.3f);
+            DropNewPieces();
             piecesToDestroy.Clear();
 
         }
@@ -134,12 +158,12 @@ public class BoardView : MonoBehaviour
         Vector2 saveFirst = first.piecePosition.anchoredPosition;
         Vector2 saveSecond = second.piecePosition.anchoredPosition;
          
-        first.piecePosition.DOAnchorPos(saveSecond, speedSwap);
+        first.piecePosition.DOAnchorPos(saveSecond, speedSwap).SetEase(easeMatch);
         second.piecePosition.DOAnchorPos(saveFirst, speedSwap).OnComplete(()=>
         {
             if (withCallback) CheckResult();
             else OnFinishSwap();
-        });
+        }).SetEase(easeMatch);
     }
 
     private void ConfirmSwap(PieceView ft, PieceView sc)
@@ -148,19 +172,19 @@ public class BoardView : MonoBehaviour
         pieces[ft.currentPiece.tupplePosition.line, ft.currentPiece.tupplePosition.column] = first;
     }
 
-    private void RemovePhysics()
-    {
-        for (var i = 0; i < pieces.GetLength(0); i++)
-        for (int j = 0; j < pieces.GetLength(1); j++)
-            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
-    }
-
-    private void AddPhysics()
-    {
-        for (var i = 0; i < pieces.GetLength(0); i++)
-        for (int j = 0; j < pieces.GetLength(1); j++)
-            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
-    }
+//    private void RemovePhysics()
+//    {
+//        for (var i = 0; i < pieces.GetLength(0); i++)
+//        for (int j = 0; j < pieces.GetLength(1); j++)
+//            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Static;
+//    }
+//
+//    private void AddPhysics()
+//    {
+//        for (var i = 0; i < pieces.GetLength(0); i++)
+//        for (int j = 0; j < pieces.GetLength(1); j++)
+//            pieces[i, j].piecePhysics.bodyType = RigidbodyType2D.Dynamic;
+//    }
 
     private void OnFinishSwap()
     {
@@ -200,7 +224,6 @@ public class BoardView : MonoBehaviour
                         {
                             pieces[i, j] = pieces[index, j];
                             pieces[index, j] = null;
-
                         }
 
                         index--;
@@ -215,7 +238,8 @@ public class BoardView : MonoBehaviour
     private void DropNewPieces()
     {
         float initalX = 0;
-        float initalY = 800f;
+        float initalY = boardSize.y;
+
 
         List<PieceView> newPiecesView = new List<PieceView>();
 
@@ -234,6 +258,8 @@ public class BoardView : MonoBehaviour
 
                 pieces[pc.currentPiece.tupplePosition.line, pc.currentPiece.tupplePosition.column] = pc;
 
+                MovePiece(pc);
+
             }
             initalY = 800;
             initalX += 265;
@@ -245,21 +271,19 @@ public class BoardView : MonoBehaviour
         {
             for (int j = pieces.GetLength(1) - 1; j >= 0; j--)
             {
-                //if (pieces[i, j] != null)
-                //{
-                    pieces[i, j].currentPiece.tupplePosition = new Tupple(i, j);
-                    pieces[i, j].UpdateText();
-                //}
+                pieces[i, j].currentPiece.tupplePosition = new Tupple(i, j);
+                pieces[i, j].UpdateText();
+                MovePiece(pieces[i, j]);
             }
         }
 
         first = second = null;
-        Invoke(nameof(CheckResult), 2);
+        Invoke(nameof(CheckResult), 0.5f);
     }
 
-    private void MovePiece(PieceView p)
+    private void MovePiece(PieceView p, bool initSession = false)
     {
-        p.piecePosition.DOAnchorPos(MatchController.ME.Destiny(p.currentPiece.tupplePosition.line, p.currentPiece.tupplePosition.column), speedMatch)
+        p.piecePosition.DOAnchorPos(MatchController.ME.Destiny(p.currentPiece.tupplePosition.line, p.currentPiece.tupplePosition.column), initSession? speedDraw : speedMatch)
             .SetEase(easeMatch);
     }
 
