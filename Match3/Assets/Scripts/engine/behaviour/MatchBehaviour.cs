@@ -9,9 +9,40 @@ namespace Assets.Scripts.engine.behaviour
     {
         public const int MINIMUM_MATCH = 3;
         private Piece[,] board;
+        private Vector2 boardSize;
+        private Vector2[,] boardPositions;
 
-        public MatchBehaviour(Piece[,] board) => this.board = board;
-        
+        public MatchBehaviour(Piece[,] board, Vector2 boardSize)
+        {
+            this.board = board;
+            this.boardSize = boardSize;
+            CreateBoardPosition();
+        }
+
+        private void CreateBoardPosition()
+        {
+            float pieceSize = 256;
+            float initialX = boardSize.x;
+            float initialY = -boardSize.y;
+
+            Debug.Log("BOARD SIZE: " + boardSize);
+
+            boardPositions = new Vector2[board.GetLength(0), board.GetLength(1)];
+
+            for (int i = board.GetLength(0)-1; i > 0; i--)
+            {
+                for (int j = board.GetLength(1)-1; j > 0 ; j--)
+                {
+                    boardPositions[i,j] = new Vector2(initialX- pieceSize, initialY + pieceSize);
+                    initialX -= pieceSize;
+
+                }
+
+                initialX = boardSize.x;
+                initialY += pieceSize;
+            }
+        }
+
         public void InitialPieces()
         {
             for (int i = 0; i < board.GetLength(0); i++)
@@ -24,6 +55,12 @@ namespace Assets.Scripts.engine.behaviour
                     board[i, j] = new Piece(i, piece, new Tupple(i, j));
                 }
             }
+        }
+
+        public Vector2 Destiny(int line, int collumn)
+        {
+            Debug.Log("POSITION: " + boardPositions[line, collumn]);
+            return boardPositions[line, collumn];
         }
 
         private int countHorizontal = 0;

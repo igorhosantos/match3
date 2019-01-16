@@ -10,9 +10,10 @@ public class GameView : MonoBehaviour, IGameServices
 
     void Awake()
     {
-        MatchController.ME.StartSession(this,8, 5);
-
         board = transform.Find("Board").gameObject.AddComponent<BoardView>();
+        MatchController.ME.StartSession(this,8, 5, board.GetComponent<RectTransform>().sizeDelta);
+
+        board.Initiate();
 
         //TODO MOCK
         Button pwOneLine = GameObject.Find("PwDestroyLine").GetComponent<Button>();

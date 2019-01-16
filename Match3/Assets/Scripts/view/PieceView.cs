@@ -33,9 +33,8 @@ public class PieceView : MonoBehaviour
         piecePosition = GetComponent<RectTransform>();
     }
     
-    public void Initate(Piece p, Vector2 destiny)
+    public void Initate(Piece p)
     {
-        this.destiny = destiny;
         currentPiece = p;
         switch (p.type)
         {

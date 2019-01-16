@@ -20,7 +20,7 @@ public class MatchSession  {
         return "[" +  board + "]";
             
     }
-    public MatchSession(IGameServices services, int line, int column)
+    public MatchSession(IGameServices services, int line, int column,Vector2 boardSize)
     {
         this.services = services;
         this.line = line;
@@ -28,7 +28,7 @@ public class MatchSession  {
 
         board = new Piece[line, column];
 
-        behaviour = new MatchBehaviour(board);
+        behaviour = new MatchBehaviour(board, boardSize);
         behaviour.InitialPieces();
     }
 
@@ -65,6 +65,11 @@ public class MatchSession  {
            
         }
 
+    }
+
+    public Vector2 Destiny(int line, int collumn)
+    {
+        return behaviour.Destiny(line, collumn);
     }
 
     private bool CheckTupple(Piece firstPiece, Piece secondPiece)

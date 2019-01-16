@@ -18,10 +18,12 @@ public class BoardView : MonoBehaviour
     public float speedMatch = 0.5f; 
     public Ease  easeMatch = Ease.InExpo; 
 
-    void Awake()
+    
+    public void Initiate()
     {
         pieceContainer = transform.Find("Pieces").gameObject;
-//        LogEngine();
+        //        LogEngine();
+
         DrawSession();
         LogView();
     }
@@ -39,12 +41,12 @@ public class BoardView : MonoBehaviour
             {
                 GameObject gb = (GameObject) Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
                 PieceView pc = gb.AddComponent<PieceView>();
-                pc.Initate(MatchController.ME.session.board[i,j], new Vector2((i*256),-(j*256)));
+                pc.Initate(MatchController.ME.session.board[i,j]);
                 pc.piecePosition.anchoredPosition = new Vector2(initalX,initalY);
                 pieces[i,j] = pc;
                 initalX += 265f;
                 pc.button.onClick.AddListener(()=>PieceChosen(pc));
-                //MovePiece(pc);
+                MovePiece(pc);
             }
             initalX = 0;
             initalY -= 256;
@@ -224,7 +226,7 @@ public class BoardView : MonoBehaviour
                 GameObject gb = (GameObject)Instantiate(Resources.Load("Prefab/Piece"), pieceContainer.transform);
                 PieceView pc = gb.AddComponent<PieceView>();
                 Piece p = newPieces[i][j];
-                pc.Initate(p,new Vector2(0,0));
+                pc.Initate(p);
                 pc.piecePosition.anchoredPosition = new Vector2(initalX, initalY);
                 initalY -= 256f;
                 pc.button.onClick.AddListener(() => PieceChosen(pc));
@@ -255,10 +257,10 @@ public class BoardView : MonoBehaviour
         Invoke(nameof(CheckResult), 2);
     }
 
-
     private void MovePiece(PieceView p)
     {
-        p.piecePosition.DOAnchorPos(p.destiny, speedMatch).SetEase(easeMatch).SetDelay(5);
+        p.piecePosition.DOAnchorPos(MatchController.ME.Destiny(p.currentPiece.tupplePosition.line, p.currentPiece.tupplePosition.column), speedMatch)
+            .SetEase(easeMatch);
     }
 
     public void LogView()

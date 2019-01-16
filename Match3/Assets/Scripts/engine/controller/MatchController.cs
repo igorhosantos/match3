@@ -7,9 +7,9 @@ public class MatchController : Singleton<MatchController> {
 
     public MatchSession session { get; private set; }
 	
-    public void StartSession(IGameServices services,int line , int collumn)
+    public void StartSession(IGameServices services,int line , int collumn , Vector2 boardSize)
     {
-        session = new MatchSession(services, line, collumn);
+        session = new MatchSession(services, line, collumn, boardSize);
         
     }
     
@@ -20,6 +20,11 @@ public class MatchController : Singleton<MatchController> {
     public List<Piece> ExecutePowerup(List<Piece> pieces)
     {
         return session.ExecutePowerup(pieces);
+    }
+
+    public Vector2 Destiny(int line, int collumn)
+    {
+        return session.Destiny(line, collumn);
     }
 
 }
