@@ -16,8 +16,8 @@ public class BoardView : MonoBehaviour
     private List<List<Piece>> newPieces;
 
     public float speedSwap = 0.3f;
-    public float speedMatch = 0.5f;
-    public float speedDraw = 1f;
+    public float speedMatch = 0.8f;
+    public float speedDraw = 1.5f;
     public Ease easeMatch = Ease.InOutExpo;
 
     public Vector2 boardSize { get; private set; }
